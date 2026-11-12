@@ -1,0 +1,2326 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>OrceiObras • Engenharia & Orçamentos</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap');
+
+    :root {
+      /* PALETA PADRÃO: AZUL-MARINHO PROFUNDO + CONSTRUÇÃO CIVIL */
+      --bg-app: #F1F4F8;              /* Concreto leve / Cinza azulado suave */
+      --surface-card: #FFFFFF;        /* Branco puro para leitura */
+      --surface-subtle: #F8FAFC;      /* Fundo suave de tabelas */
+
+      /* AZUL-MARINHO (COR PADRÃO DO SISTEMA) */
+      --navy-950: #06101F;
+      --navy-900: #0A192F;            /* Azul-marinho principal (Sidebar, Headers, Login) */
+      --navy-800: #112240;            /* Azul-marinho médio (Botões, Cards escuros) */
+      --navy-700: #1D3557;            /* Azul-marinho destaque / hover */
+      --navy-100: #E6ECF5;            /* Azul-marinho bem claro para fundos e tabelas */
+
+      /* TERRACOTA / TIJOLO CERÂMICO SUAVE (DESTAQUES DE OBRA) */
+      --terracotta-600: #C25934;
+      --terracotta-700: #A34625;
+      --terracotta-100: #FBECE6;
+
+      /* NEUTROS DE APOIO */
+      --slate-900: #0F172A;
+      --slate-700: #334155;
+      --slate-500: #64748B;
+      --slate-400: #94A3B8;
+      --slate-300: #CBD5E1;
+      --slate-200: #E2E8F0;
+
+      /* CALCULADORA (CHASSI AZUL-MARINHO INDUSTRIAL & VISOR LCD) */
+      --calc-chassis: #0F1E36;
+      --calc-bezel: #060D18;
+      --calc-lcd-bg: #0B1922;
+      --calc-lcd-text: #2DD4BF;
+      --calc-lcd-muted: #99F6E4;
+
+      --radius-xl: 20px;
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --radius-sm: 8px;
+
+      --shadow-soft: 0 2px 12px rgba(10, 25, 47, 0.06);
+      --shadow-chassis: 0 18px 32px -10px rgba(10, 25, 47, 0.32), inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    html, body { width: 100%; max-width: 100vw; overflow-x: hidden; background-color: var(--bg-app); color: var(--slate-900); }
+
+    /* CONTROLE DE TELAS */
+    .screen-view { display: none; width: 100%; }
+    .screen-view.active { display: block; }
+    .sub-page { display: none; animation: fadeSlide 0.2s ease; width: 100%; }
+    .sub-page.active { display: block; }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* CABEÇALHO EXCLUSIVO DE IMPRESSÃO / PDF */
+    .print-only-header, .print-only-footer { display: none; }
+
+    /* =========================================================
+       TELA DE LOGIN
+       ========================================================= */
+    .auth-wrapper {
+      min-height: 100vh;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, var(--navy-950) 0%, var(--navy-900) 55%, var(--navy-800) 100%);
+      padding: 1.25rem;
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 390px;
+      background: var(--surface-card);
+      border-radius: var(--radius-xl);
+      padding: 2.25rem 1.75rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+      border-top: 4px solid var(--navy-800);
+    }
+
+    /* LOGO COMPONENTE */
+    .logo-box { display: inline-flex; align-items: center; gap: 10px; user-select: none; }
+    .logo-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: var(--terracotta-600);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 3px 10px rgba(194, 89, 52, 0.3);
+    }
+    .logo-title { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.6px; }
+    .logo-title.dark { color: var(--navy-900); }
+    .logo-title.light { color: #FFFFFF; }
+    .logo-title span { color: var(--terracotta-600); font-weight: 700; }
+    .logo-title.light span { color: #F29B7E; }
+    .logo-subtitle { font-size: 0.62rem; font-weight: 600; letter-spacing: 1.4px; color: var(--slate-500); }
+
+    /* =========================================================
+       LAYOUT PRINCIPAL
+       ========================================================= */
+    .app-layout { display: flex; min-height: 100vh; width: 100%; }
+
+    /* SIDEBAR DESKTOP (AZUL-MARINHO PADRÃO) */
+    .sidebar {
+      width: 265px;
+      background: var(--navy-900);
+      color: #F8FAFC;
+      padding: 1.75rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      border-right: 1px solid rgba(255,255,255,0.07);
+    }
+    .sidebar-header {
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .connection-badge {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      font-size: 0.72rem; font-weight: 500; padding: 5px 10px; border-radius: 20px;
+      background: rgba(45, 212, 191, 0.12); color: #5EEAD4; border: 1px solid rgba(45, 212, 191, 0.25);
+    }
+    .connection-badge.offline {
+      background: rgba(251, 191, 36, 0.12); color: #FDE047; border-color: rgba(251, 191, 36, 0.25);
+    }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+    .sidebar nav { display: flex; flex-direction: column; gap: 5px; flex: 1; }
+    .sidebar nav a {
+      color: #CBD5E1; text-decoration: none; padding: 0.78rem 0.95rem;
+      border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between;
+      font-weight: 500; font-size: 0.88rem; transition: all 0.15s ease;
+    }
+    .sidebar nav a:hover { background: var(--navy-800); color: #FFFFFF; }
+    .sidebar nav a.active {
+      background: var(--navy-700); color: #FFFFFF; font-weight: 600;
+      border-left: 3px solid var(--terracotta-600);
+      box-shadow: 0 4px 12px rgba(6, 16, 31, 0.35);
+    }
+
+    .nav-counter {
+      background: var(--terracotta-600);
+      color: #FFFFFF;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 12px;
+    }
+
+    .user-card-sidebar {
+      margin-top: auto; padding: 0.9rem; background: var(--navy-800);
+      border-radius: var(--radius-md); font-size: 0.78rem; color: #CBD5E1;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    /* ELEMENTOS MOBILE */
+    .mobile-top-hub { display: none; }
+    .mobile-bottom-nav { display: none; }
+
+    .main-viewport {
+      flex: 1;
+      padding: 2rem 2.25rem;
+      max-width: 1380px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .page-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;
+    }
+    .page-header h2 { font-size: 1.4rem; font-weight: 700; color: var(--navy-900); letter-spacing: -0.4px; }
+    .page-header p { font-size: 0.85rem; color: var(--slate-500); margin-top: 2px; }
+
+    /* =========================================================
+       CALCULADORA FÍSICA (AZUL-MARINHO INDUSTRIAL)
+       ========================================================= */
+    .calc-workspace {
+      display: grid;
+      grid-template-columns: 385px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+      width: 100%;
+    }
+
+    .physical-calculator {
+      background: var(--calc-chassis);
+      border-radius: var(--radius-xl);
+      padding: 1.25rem;
+      box-shadow: var(--shadow-chassis);
+      border: 1px solid var(--navy-700);
+      color: #F8FAFC;
+      width: 100%;
+    }
+
+    .physical-calculator.engin-pro-chassis {
+      background: linear-gradient(165deg, var(--navy-900) 0%, var(--navy-950) 100%);
+      border: 1px solid var(--navy-700);
+    }
+
+    .calc-brand-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 0.85rem; padding: 0 2px;
+    }
+    .calc-model-name {
+      font-size: 0.68rem; font-weight: 600; letter-spacing: 1.2px;
+      color: #93C5FD; text-transform: uppercase;
+    }
+    .solar-cell {
+      width: 48px; height: 14px; background: #050A14;
+      border-radius: 3px; border: 1px solid var(--navy-700);
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; padding: 2px;
+    }
+    .solar-cell span { background: var(--navy-800); }
+
+    /* VISOR DIGITAL */
+    .calc-lcd-screen {
+      background: var(--calc-lcd-bg);
+      border: 2px solid var(--calc-bezel);
+      border-radius: var(--radius-md);
+      padding: 0.95rem 1.1rem;
+      margin-bottom: 1rem;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.6);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .engin-pro-chassis .calc-lcd-screen {
+      background: #071324;
+      border-color: var(--navy-700);
+    }
+    .lcd-top-row {
+      display: flex; justify-content: space-between;
+      font-size: 0.68rem; color: var(--calc-lcd-muted); opacity: 0.85; margin-bottom: 0.35rem;
+    }
+    .lcd-main-value {
+      font-size: 1.55rem; font-weight: 700; color: var(--calc-lcd-text);
+      text-align: right; line-height: 1.2;
+    }
+    .engin-pro-chassis .lcd-main-value {
+      color: #38BDF8;
+    }
+    .lcd-sub-value {
+      font-size: 0.78rem; color: #E2E8F0; text-align: right; margin-top: 4px;
+    }
+
+    /* CONTROLES INTERNOS DA CALCULADORA */
+    .calc-body-controls { display: flex; flex-direction: column; gap: 0.75rem; }
+    .calc-field-group {
+      background: rgba(10, 25, 47, 0.65);
+      padding: 0.75rem;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .calc-field-group label {
+      display: block; font-size: 0.74rem; font-weight: 500;
+      color: #CBD5E1; margin-bottom: 0.35rem;
+    }
+    .calc-input, .calc-select {
+      width: 100%; background: var(--navy-950); border: 1px solid var(--navy-700);
+      color: #F8FAFC; padding: 0.56rem 0.68rem; border-radius: var(--radius-sm);
+      font-size: 0.86rem; outline: none; transition: border-color 0.2s;
+    }
+    .calc-input:focus, .calc-select:focus { border-color: #38BDF8; }
+
+    /* GRADE 3D DA ENGIN-PRO */
+    .dims-3d-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+    }
+    .dims-3d-grid span.dim-lbl {
+      display: block;
+      font-size: 0.66rem;
+      color: var(--slate-400);
+      margin-bottom: 2px;
+      white-space: nowrap;
+    }
+
+    /* TECLAS TÁTEIS */
+    .calc-key-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 0.45rem; }
+    .calc-key-btn {
+      background: var(--navy-800); color: #F8FAFC; border: 1px solid rgba(255,255,255,0.06);
+      border-bottom: 2px solid var(--navy-950); padding: 0.52rem 0.35rem;
+      border-radius: var(--radius-sm); font-size: 0.74rem; font-weight: 500;
+      cursor: pointer; transition: all 0.1s;
+    }
+    .calc-key-btn:hover { background: var(--navy-700); }
+    .calc-key-btn:active { transform: translateY(1px); }
+    .calc-key-btn.primary-key { background: var(--terracotta-600); color: #FFFFFF; font-weight: 600; border-bottom-color: #7C2D12; }
+
+    /* =========================================================
+       CARDS LIMPOS E FORMULÁRIOS
+       ========================================================= */
+    .clean-card {
+      background: var(--surface-card);
+      border-radius: var(--radius-lg);
+      padding: 1.4rem;
+      border: 1px solid var(--slate-200);
+      box-shadow: var(--shadow-soft);
+      width: 100%;
+    }
+
+    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--slate-700); }
+    .form-control {
+      width: 100%; padding: 0.68rem 0.85rem; border: 1px solid var(--slate-300);
+      border-radius: var(--radius-sm); font-size: 0.88rem; background: #FFFFFF; color: var(--slate-900);
+      outline: none; transition: border-color 0.2s;
+    }
+    .form-control:focus { border-color: var(--navy-700); box-shadow: 0 0 0 3px rgba(10, 25, 47, 0.08); }
+
+    /* BOTÕES (AZUL-MARINHO COMO PADRÃO) */
+    .btn {
+      padding: 0.65rem 1.1rem; border-radius: var(--radius-sm); border: none;
+      font-weight: 600; font-size: 0.84rem; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all 0.15s ease; text-decoration: none;
+    }
+    .btn-primary { background: var(--navy-900); color: #FFFFFF; }
+    .btn-primary:hover { background: var(--navy-700); }
+    .btn-terracotta { background: var(--terracotta-600); color: #FFFFFF; }
+    .btn-terracotta:hover { background: var(--terracotta-700); }
+    .btn-soft { background: var(--surface-subtle); color: var(--navy-900); border: 1px solid var(--slate-300); }
+    .btn-soft:hover { background: var(--navy-100); }
+    .btn-whatsapp { background: #1E6B43; color: #FFFFFF; }
+    .btn-whatsapp:hover { background: #165334; }
+    .btn-excel { background: var(--navy-700); color: #FFFFFF; }
+    .btn-excel:hover { background: var(--navy-800); }
+
+    /* TABELA DESKTOP + CARDS MOBILE */
+    .table-wrapper { width: 100%; }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
+    th {
+      background: var(--navy-100); color: var(--navy-900);
+      font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.4px;
+      padding: 0.78rem 0.8rem; border-bottom: 1px solid var(--slate-200);
+    }
+    td { padding: 0.75rem 0.8rem; border-bottom: 1px solid var(--slate-200); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+
+    .qty-highlight { color: var(--terracotta-600); font-weight: 700; font-size: 0.94rem; }
+
+    .input-price {
+      width: 80px; padding: 0.35rem 0.45rem; border: 1px solid var(--slate-300);
+      border-radius: 6px; font-weight: 600; color: var(--slate-900); text-align: right; font-size: 0.84rem;
+    }
+    .input-price:focus { border-color: var(--navy-700); outline: none; }
+
+    .select-origin {
+      padding: 0.35rem 0.45rem; border: 1px solid var(--slate-300); border-radius: 6px;
+      font-size: 0.78rem; font-weight: 500; color: var(--slate-700); background: var(--surface-subtle);
+      max-width: 145px;
+    }
+
+    .badge-tag {
+      display: inline-block; font-size: 0.72rem; font-weight: 600;
+      padding: 3px 10px; border-radius: 20px;
+      background: var(--terracotta-100); color: var(--terracotta-700);
+    }
+    .badge-extra { background: var(--navy-100); color: var(--navy-800); }
+
+    .btn-remove {
+      background: #FEE2E2; color: #991B1B; border: none; padding: 5px 9px;
+      border-radius: 6px; font-weight: 600; font-size: 0.74rem; cursor: pointer;
+    }
+
+    /* MEMÓRIA DE CÁLCULO TÉCNICO (ENGIN-PRO) */
+    .tech-memory-box {
+      background: var(--navy-100);
+      border-left: 4px solid var(--navy-900);
+      padding: 0.75rem 1rem;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin-bottom: 1rem;
+      font-size: 0.8rem;
+      color: var(--navy-900);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* SEÇÃO DE MÃO DE OBRA */
+    .labor-box {
+      margin-top: 1.25rem;
+      background: var(--surface-subtle);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+    }
+    .labor-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 10px;
+      align-items: center;
+      margin-top: 0.5rem;
+    }
+
+    /* RESUMO FINANCEIRO */
+    .summary-footer {
+      background: var(--navy-100);
+      border: 1px solid #C5D3E6;
+      border-radius: var(--radius-md);
+      padding: 1.15rem 1.25rem;
+      margin-top: 1.25rem;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+    }
+    .summary-breakdown {
+      display: flex;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      font-size: 0.8rem;
+      color: var(--navy-900);
+      margin-bottom: 4px;
+    }
+
+    /* BARRA DE AÇÃO DA OBRA */
+    .project-action-bar {
+      display: flex;
+      gap: 8px;
+      margin-top: 0.85rem;
+      flex-wrap: wrap;
+    }
+
+    /* BARRAS DE ADICIONAR MATERIAL EXTRA */
+    .extra-material-bar {
+      margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px dashed var(--slate-300);
+    }
+    .extra-grid-quick {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+    .extra-grid-hw {
+      display: grid;
+      grid-template-columns: 1.5fr 1.5fr 0.85fr 0.85fr 0.95fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* CARDS DE ETAPAS E HISTÓRICO */
+    .stage-pill {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--surface-subtle);
+      border: 1px solid var(--slate-200);
+      padding: 0.8rem 1rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 0.6rem;
+      gap: 10px;
+    }
+
+    /* VITRINE DE LOJAS */
+    .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 1.25rem; }
+    .store-card {
+      background: var(--surface-card); border-radius: var(--radius-lg); overflow: hidden;
+      border: 1px solid var(--slate-200); box-shadow: var(--shadow-soft);
+      cursor: pointer; transition: transform 0.2s ease;
+    }
+    .store-card:hover { transform: translateY(-3px); border-color: var(--navy-700); }
+    .store-card img.banner { width: 100%; height: 130px; object-fit: cover; }
+    .store-card-body { padding: 1.1rem; }
+
+    .store-banner-full {
+      height: 160px; border-radius: var(--radius-lg); background-size: cover; background-position: center;
+      position: relative; margin-bottom: 3.5rem; background-color: var(--slate-300);
+    }
+    .store-avatar-full {
+      width: 88px; height: 88px; border-radius: 50%; border: 4px solid #FFFFFF;
+      position: absolute; bottom: -32px; left: 20px; object-fit: cover; background: #FFFFFF;
+      box-shadow: var(--shadow-soft);
+    }
+
+    /* =========================================================
+       RESPONSIVIDADE 100% MOBILE & TABLET
+       ========================================================= */
+    @media (max-width: 1024px) {
+      .sidebar { display: none; }
+      .app-layout { flex-direction: column; padding-bottom: 72px; }
+
+      .mobile-top-hub {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--navy-900);
+        color: #FFFFFF;
+        padding: 0.85rem 1rem;
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        width: 100%;
+        border-bottom: 2px solid var(--terracotta-600);
+      }
+
+      .mobile-bottom-nav {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        width: 100%;
+        height: 64px;
+        background: #FFFFFF;
+        border-top: 1px solid var(--slate-200);
+        z-index: 40;
+        box-shadow: 0 -2px 10px rgba(10, 25, 47, 0.08);
+      }
+      .bottom-nav-item {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 3px; font-size: 0.65rem; font-weight: 600; color: var(--slate-500);
+        background: none; border: none; cursor: pointer; padding: 4px 2px; position: relative;
+      }
+      .bottom-nav-item.active {
+        color: var(--navy-900);
+        background: var(--navy-100);
+        border-top: 2px solid var(--navy-900);
+      }
+      .bottom-nav-item span.icon { font-size: 1.15rem; }
+      .mobile-badge {
+        position: absolute; top: 4px; right: 14%;
+        background: var(--terracotta-600); color: #fff;
+        font-size: 0.6rem; font-weight: 700; padding: 1px 5px; border-radius: 10px;
+      }
+
+      .main-viewport { padding: 1rem; width: 100%; }
+      .calc-workspace { grid-template-columns: 1fr; gap: 1.25rem; }
+      .physical-calculator { max-width: 100%; }
+      .form-grid-2 { grid-template-columns: 1fr; gap: 0; }
+    }
+
+    @media (max-width: 768px) {
+      .table-wrapper table,
+      .table-wrapper thead,
+      .table-wrapper tbody,
+      .table-wrapper th,
+      .table-wrapper td,
+      .table-wrapper tr {
+        display: block;
+        width: 100%;
+      }
+      .table-wrapper thead { display: none; }
+      .table-wrapper tr {
+        background: var(--surface-subtle);
+        border: 1px solid var(--slate-200);
+        border-radius: var(--radius-md);
+        padding: 0.85rem;
+        margin-bottom: 0.75rem;
+      }
+      .table-wrapper td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.42rem 0;
+        border-bottom: 1px solid var(--slate-200);
+        text-align: right;
+      }
+      .table-wrapper td:last-child { border-bottom: none; padding-bottom: 0; }
+      .table-wrapper td::before {
+        content: attr(data-label);
+        font-size: 0.74rem;
+        font-weight: 600;
+        color: var(--slate-500);
+        text-transform: uppercase;
+        text-align: left;
+      }
+      .select-origin { max-width: 165px; }
+
+      .labor-grid { grid-template-columns: 1fr; }
+
+      .extra-grid-quick { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .extra-grid-quick input:nth-child(1) { grid-column: span 2; }
+      .extra-grid-quick input:nth-child(4) { grid-column: span 2; }
+      .extra-grid-quick button { grid-column: span 2; width: 100%; }
+
+      .extra-grid-hw { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .extra-grid-hw input:nth-child(1) { grid-column: span 2; }
+      .extra-grid-hw input:nth-child(2) { grid-column: span 2; }
+      .extra-grid-hw input:nth-child(5) { grid-column: span 2; }
+      .extra-grid-hw button { grid-column: span 2; width: 100%; }
+
+      .summary-footer { flex-direction: column; align-items: stretch; text-align: center; }
+      .summary-breakdown { justify-content: center; }
+      .export-btns { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; }
+      .export-btns .btn { padding: 0.65rem 0.4rem; font-size: 0.78rem; }
+      .project-action-bar { flex-direction: column; }
+      .project-action-bar .btn { width: 100%; }
+    }
+
+    /* =========================================================
+       FORMATAÇÃO PROFISSIONAL PARA PDF / IMPRESSÃO
+       ========================================================= */
+    @media print {
+      body { background: #FFFFFF !important; }
+      .sidebar, .mobile-top-hub, .mobile-bottom-nav, .physical-calculator, .extra-material-bar, .export-btns, .project-action-bar, .no-print { display: none !important; }
+      .main-viewport { padding: 0; max-width: 100%; }
+      .calc-workspace { display: block; }
+      .clean-card { border: none; box-shadow: none; padding: 0; }
+      
+      .print-only-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        border-bottom: 2px solid var(--navy-900);
+        padding-bottom: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      .print-only-footer {
+        display: block;
+        margin-top: 3rem;
+        padding-top: 1rem;
+        border-top: 1px solid #CBD5E1;
+        font-size: 0.8rem;
+        color: #475569;
+      }
+      .table-wrapper table { display: table !important; }
+      .table-wrapper thead { display: table-header-group !important; }
+      .table-wrapper tbody { display: table-row-group !important; }
+      .table-wrapper tr { display: table-row !important; background: none !important; border: none !important; }
+      .table-wrapper td, .table-wrapper th { display: table-cell !important; text-align: left !important; border-bottom: 1px solid #CBD5E1 !important; padding: 8px !important; }
+      .table-wrapper td::before { display: none !important; }
+      input, select { border: none !important; background: transparent !important; appearance: none; font-weight: 600; color: #000 !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TELA DE ACESSO -->
+  <div id="view-login" class="screen-view active">
+    <div class="auth-wrapper">
+      <div class="auth-card">
+        <div style="text-align: center; margin-bottom: 1.75rem;">
+          <div class="logo-box">
+            <div class="logo-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2">
+                <path d="M12 2L22 12L12 22L2 12L12 2Z"/>
+                <circle cx="12" cy="12" r="2" fill="#FFFFFF"/>
+              </svg>
+            </div>
+            <div style="text-align: left;">
+              <div class="logo-title dark">Orcei<span>Obras</span></div>
+              <div class="logo-subtitle">ENGENHARIA & QUANTITATIVOS</div>
+            </div>
+          </div>
+        </div>
+        
+        <form onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label>E-mail Profissional</label>
+            <input type="email" id="loginEmail" class="form-control" value="engenharia@orceiobras.com" required>
+          </div>
+          <div class="form-group">
+            <label>Senha</label>
+            <input type="password" id="loginPass" class="form-control" value="123456" required>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem; margin-top: 0.5rem;">Acessar Sistema</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- SISTEMA PRINCIPAL -->
+  <div id="system-app" class="screen-view">
+
+    <!-- CABEÇALHO MOBILE -->
+    <header class="mobile-top-hub">
+      <div class="logo-box" style="gap: 8px;">
+        <div class="logo-icon" style="width: 30px; height: 30px; border-radius: 7px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2">
+            <path d="M12 2L22 12L12 22L2 12L12 2Z"/>
+            <circle cx="12" cy="12" r="2" fill="#FFFFFF"/>
+          </svg>
+        </div>
+        <div class="logo-title light" style="font-size: 1.15rem;">Orcei<span>Obras</span></div>
+      </div>
+      <span id="mobileConnStatus" style="font-size: 0.72rem; color: #5EEAD4; font-weight: 600;">● Online</span>
+    </header>
+
+    <div class="app-layout">
+      <!-- SIDEBAR DESKTOP -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="logo-box">
+            <div class="logo-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2">
+                <path d="M12 2L22 12L12 22L2 12L12 2Z"/>
+                <circle cx="12" cy="12" r="2" fill="#FFFFFF"/>
+              </svg>
+            </div>
+            <div>
+              <div class="logo-title light">Orcei<span>Obras</span></div>
+              <div class="logo-subtitle" style="color: #94A3B8;">ENGENHARIA & ORÇAMENTOS</div>
+            </div>
+          </div>
+
+          <div id="connectionStatus" class="connection-badge">
+            <span class="status-dot"></span>
+            <span id="connectionText">Online • Sincronizado</span>
+          </div>
+        </div>
+        
+        <nav>
+          <a href="#" id="link-calc-quick" class="active" onclick="navToPage('page-calc-quick')"><span>⚡ Calculadora Rápida</span></a>
+          <a href="#" id="link-calc-hardware" onclick="navToPage('page-calc-hardware')"><span>🏗️ Engin-Pro Estrutural</span></a>
+          <a href="#" id="link-project-summary" onclick="navToPage('page-project-summary')">
+            <span>📋 Obra & Histórico</span>
+            <span class="nav-counter" id="sidebarStageCount">0</span>
+          </a>
+          <a href="#" id="link-lojas-feed" onclick="navToPage('page-lojas-feed')"><span>🏬 Fornecedores Locais</span></a>
+          <a href="#" id="link-create-store" onclick="navToPage('page-create-store')"><span>➕ Cadastrar Depósito</span></a>
+          <a href="#" id="link-my-stores" onclick="navToPage('page-my-stores')"><span>⚙️ Minhas Lojas</span></a>
+        </nav>
+
+        <div class="user-card-sidebar">
+          <div style="font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.5px;">Profissional</div>
+          <div id="usrName" style="color: #FFFFFF; font-weight: 600; margin-top: 2px; word-break: break-all;">engenharia@orceiobras.com</div>
+          <a href="#" onclick="logout()" style="color: #F29B7E; text-decoration: none; display: inline-block; margin-top: 8px; font-weight: 500;">Encerrar sessão</a>
+        </div>
+      </aside>
+
+      <main class="main-viewport">
+
+        <!-- CABEÇALHO EXCLUSIVO DE IMPRESSÃO / PDF -->
+        <div class="print-only-header">
+          <div>
+            <h1 style="font-size: 1.5rem; color: #0A192F;">PROPOSTA DE ORÇAMENTO — ORCEIOBRAS</h1>
+            <p style="font-size: 0.85rem; color: #475569; margin-top: 4px;" id="printClientInfo">Cliente / Obra: Não informado</p>
+            <p style="font-size: 0.8rem; color: #64748B;" id="printRespInfo">Responsável Técnico: engenharia@orceiobras.com</p>
+          </div>
+          <div style="text-align: right; font-size: 0.82rem; color: #334155;">
+            <div><strong>Emissão:</strong> <span id="printDate"></span></div>
+            <div><strong>Validade:</strong> 10 dias</div>
+          </div>
+        </div>
+
+        <!-- =========================================================
+             1. CALCULADORA RÁPIDA (ESTIMATIVA DE SUPERFÍCIE 2D)
+             ========================================================= -->
+        <div id="page-calc-quick" class="sub-page active">
+          <div class="page-header no-print">
+            <div>
+              <h2>Calculadora Rápida de Obra</h2>
+              <p>Estimativa ágil por área (m²) para paredes, pisos, pintura e cobertura.</p>
+            </div>
+          </div>
+
+          <div class="calc-workspace">
+            <div class="physical-calculator">
+              <div class="calc-brand-bar">
+                <span class="calc-model-name">ORCEI-CALC • EXPRESS 2D</span>
+                <div class="solar-cell"><span></span><span></span><span></span><span></span></div>
+              </div>
+
+              <div class="calc-lcd-screen">
+                <div class="lcd-top-row">
+                  <span id="qcLcdService">ALVENARIA</span>
+                  <span id="qcLcdWaste">PERDA: 10%</span>
+                </div>
+                <div class="lcd-main-value" id="qcLcdArea">14.00 m²</div>
+                <div class="lcd-sub-value" id="qcLcdCost">TOTAL: R$ 0,00</div>
+              </div>
+
+              <div class="calc-body-controls">
+                <div class="calc-field-group">
+                  <label>1. Etapa / Serviço Rápido</label>
+                  <select id="qcType" class="calc-select" onchange="runQuickCalc()">
+                    <option value="tijolos">Parede Simples (Tijolo Baiano 6 Furos)</option>
+                    <option value="piso">Contrapiso Regularizado (3 cm)</option>
+                    <option value="pintura">Pintura Acrílica (2 Demãos + Selador)</option>
+                    <option value="telhado">Telhado Cerâmico Completo (Madeiramento)</option>
+                    <option value="ceramica">Assentamento Piso Cerâmico / Porcelanato</option>
+                  </select>
+                </div>
+
+                <div class="calc-field-group">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                    <label style="margin:0;">2. Medidas de Superfície</label>
+                    <select id="qcCalcMode" class="calc-select" style="width: auto; padding: 2px 8px; font-size: 0.74rem;" onchange="toggleQuickInputs()">
+                      <option value="dims">Comp. × Alt/Larg</option>
+                      <option value="direct">Área Direta (m²)</option>
+                    </select>
+                  </div>
+
+                  <div id="qcDimsGroup" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <div>
+                      <span style="font-size: 0.7rem; color: var(--slate-400);">Comprimento (m)</span>
+                      <input type="number" id="qcLength" class="calc-input" value="5.0" step="0.1" min="0" oninput="runQuickCalc()">
+                    </div>
+                    <div>
+                      <span style="font-size: 0.7rem; color: var(--slate-400);">Altura / Largura (m)</span>
+                      <input type="number" id="qcHeight" class="calc-input" value="2.8" step="0.1" min="0" oninput="runQuickCalc()">
+                    </div>
+                  </div>
+
+                  <div id="qcDirectGroup" style="display: none;">
+                    <span style="font-size: 0.7rem; color: var(--slate-400);">Área Total (m²)</span>
+                    <input type="number" id="qcVal" class="calc-input" value="14.0" step="0.1" min="0" oninput="runQuickCalc()">
+                  </div>
+
+                  <div class="calc-key-grid" style="margin-top: 8px;">
+                    <button type="button" class="calc-key-btn" onclick="setQuickDims(3, 2.8)">3×2.8m</button>
+                    <button type="button" class="calc-key-btn" onclick="setQuickDims(5, 2.8)">5×2.8m</button>
+                    <button type="button" class="calc-key-btn" onclick="setQuickDims(10, 3)">10×3.0m</button>
+                  </div>
+                </div>
+
+                <div class="calc-field-group">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <label style="margin:0;">3. Margem de Perda (%)</label>
+                    <input type="number" id="qcWasteInput" class="calc-input" style="width: 70px; text-align: center; padding: 4px;" value="10" min="0" max="50" oninput="runQuickCalc()">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="clean-card">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 8px;">
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--navy-900);">Lista de Materiais & Custos</h3>
+                <span class="badge-tag" id="qcWasteBadge">+10% de sobra incluída</span>
+              </div>
+
+              <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Insumo</th>
+                      <th>Qtd. Final</th>
+                      <th>Unid.</th>
+                      <th>Preço Unit. (R$)</th>
+                      <th>Subtotal</th>
+                      <th>Fornecedor</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="qcResultTable"></tbody>
+                </table>
+              </div>
+
+              <!-- ESTIMATIVA DE MÃO DE OBRA -->
+              <div class="labor-box no-print">
+                <div style="font-size: 0.82rem; font-weight: 700; color: var(--navy-900);">👷 Estimativa de Mão de Obra (Opcional)</div>
+                <div class="labor-grid">
+                  <select id="qcLaborMode" class="form-control" onchange="runQuickCalc()">
+                    <option value="unit">Cobrança por m²</option>
+                    <option value="fixed">Valor Fechado (Empreitada)</option>
+                  </select>
+                  <input type="number" id="qcLaborRate" class="form-control" placeholder="Valor R$ (ex: 45.00)" value="0" step="1" min="0" oninput="runQuickCalc()">
+                  <div style="font-size: 0.82rem; color: var(--slate-700); font-weight: 600; text-align: right;">
+                    Mão de Obra: <span id="qcLaborDisplay" style="color: var(--navy-800);">R$ 0,00</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="extra-material-bar">
+                <div style="font-size: 0.82rem; font-weight: 600; color: var(--navy-900); margin-bottom: 0.6rem;">+ Adicionar Material Extra (Empreiteiro)</div>
+                <div class="extra-grid-quick">
+                  <input type="text" id="qcCustomName" class="form-control" placeholder="Nome do Material (ex: Arame recozido)">
+                  <input type="number" id="qcCustomQty" class="form-control" placeholder="Qtd Base" step="0.1">
+                  <select id="qcCustomUnit" class="form-control">
+                    <option value="Un">Un</option>
+                    <option value="Sacos">Sacos</option>
+                    <option value="m³">m³</option>
+                    <option value="Kg">Kg</option>
+                    <option value="Litros">Litros</option>
+                  </select>
+                  <input type="number" id="qcCustomPrice" class="form-control" placeholder="Preço Unit. (R$)" step="0.01">
+                  <button type="button" class="btn btn-primary" onclick="addQuickCustomMaterial()">Incluir</button>
+                </div>
+              </div>
+
+              <div class="summary-footer">
+                <div>
+                  <div class="summary-breakdown">
+                    <span>Materiais: <strong id="qcMatOnlyTotal">R$ 0,00</strong></span>
+                    <span>Mão de Obra: <strong id="qcLabOnlyTotal">R$ 0,00</strong></span>
+                  </div>
+                  <div style="font-size: 1.65rem; font-weight: 700; color: var(--navy-900);" id="qcTotalPrice">R$ 0,00</div>
+                </div>
+                <div style="display: flex; gap: 8px;" class="export-btns">
+                  <button class="btn btn-soft" onclick="prepareAndPrint()">📄 PDF</button>
+                  <button class="btn btn-excel" onclick="exportToExcel('quick')">📊 Excel</button>
+                  <button class="btn btn-whatsapp" onclick="shareWhatsApp('quick')">💬 WhatsApp</button>
+                </div>
+              </div>
+
+              <div class="project-action-bar no-print">
+                <button type="button" class="btn btn-terracotta" style="flex: 1;" onclick="addStageToProject('quick')">➕ Incluir Etapa no Orçamento da Obra</button>
+                <button type="button" class="btn btn-primary" onclick="saveSingleBudgetToHistory('quick')">💾 Salvar no Histórico</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =========================================================
+             2. CALCULADORA AVANÇADA ENGIN-PRO (CÁLCULO ESTRUTURAL & 3D)
+             ========================================================= -->
+        <div id="page-calc-hardware" class="sub-page">
+          <div class="page-header no-print">
+            <div>
+              <h2>Engin-Pro • Cálculo Estrutural & Volumétrico</h2>
+              <p>Dimensionamento 3D real com traços de concreto, taxa de aço (kg/m³), fôrmas e relação água/cimento.</p>
+            </div>
+          </div>
+
+          <div class="calc-workspace">
+            <div class="physical-calculator engin-pro-chassis">
+              <div class="calc-brand-bar">
+                <span class="calc-model-name">ENGIN-PRO • STRUCTURAL 3D</span>
+                <div class="solar-cell"><span></span><span></span><span></span><span></span></div>
+              </div>
+
+              <div class="calc-lcd-screen">
+                <div class="lcd-top-row">
+                  <span id="hwLcdTrace">FCK 25 MPA • 1:2:3</span>
+                  <span id="hwLcdSteel">AÇO: 85 KG/M³</span>
+                </div>
+                <div class="lcd-main-value" id="screenPrimaryReadout">4.80 m³</div>
+                <div class="lcd-sub-value" id="screenSecondaryReadout">ÁREA: 40.00 m² • CUSTO: R$ 0,00</div>
+              </div>
+
+              <div class="calc-body-controls">
+                <div class="calc-field-group">
+                  <label>1. Elemento Estrutural / Sistema Construtivo</label>
+                  <select id="hwType" class="calc-select" onchange="onHwElementChange()">
+                    <option value="laje_macica">Laje Maciça / Radier Armado (Fck 25 MPa)</option>
+                    <option value="vigas_pilares">Vigas & Pilares Concreto Armado (Fck 30 MPa)</option>
+                    <option value="sapata_baldrame">Fundação / Viga Baldrame Impermeabilizada</option>
+                    <option value="alvenaria_estrutural">Alvenaria Estrutural Armada (Bloco 14×19×39)</option>
+                    <option value="reboco_tecnico">Reboco / Emboço Técnico (Traço 1:2:8)</option>
+                  </select>
+                </div>
+
+                <!-- DIMENSIONAMENTO 3D REAL -->
+                <div class="calc-field-group">
+                  <label id="hwDimsTitle">2. Geometria 3D da Peça Estrutural</label>
+                  <div class="dims-3d-grid">
+                    <div>
+                      <span class="dim-lbl" id="hwLblDim1">Comprimento (m)</span>
+                      <input type="number" id="hwDim1" class="calc-input" value="8.0" step="0.1" min="0" oninput="updateHardwareCalc()">
+                    </div>
+                    <div>
+                      <span class="dim-lbl" id="hwLblDim2">Largura (m)</span>
+                      <input type="number" id="hwDim2" class="calc-input" value="5.0" step="0.1" min="0" oninput="updateHardwareCalc()">
+                    </div>
+                    <div>
+                      <span class="dim-lbl" id="hwLblDim3">Espessura (cm)</span>
+                      <input type="number" id="hwDim3" class="calc-input" value="12" step="1" min="0" oninput="updateHardwareCalc()">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- PARÂMETRO DE ENGENHARIA -->
+                <div class="calc-field-group">
+                  <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 8px;">
+                    <div>
+                      <label id="hwEngParamLabel">3. Densidade de Aço</label>
+                      <select id="hwSteelRate" class="calc-select" onchange="updateHardwareCalc()">
+                        <option value="65">Leve (65 kg/m³)</option>
+                        <option value="85" selected>Média (85 kg/m³)</option>
+                        <option value="110">Pesada (110 kg/m³)</option>
+                        <option value="0">Sem Armadura (0 kg)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label>Perda (%)</label>
+                      <input type="number" id="hwWaste" class="calc-input" style="text-align: center;" value="8" min="0" max="50" oninput="updateHardwareCalc()">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- PRESETS DE ENGENHARIA -->
+                <div class="calc-key-grid">
+                  <button type="button" class="calc-key-btn" onclick="applyEnginPreset('laje_macica', 8, 5, 12, 85)">Laje 40m²</button>
+                  <button type="button" class="calc-key-btn" onclick="applyEnginPreset('vigas_pilares', 25, 0.4, 20, 110)">Vigas 25m</button>
+                  <button type="button" class="calc-key-btn primary-key" onclick="saveSingleBudgetToHistory('hardware')">💾 Salvar</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="clean-card">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 8px;">
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--navy-900);">Memória de Cálculo & Quantitativo Técnico</h3>
+                <span class="badge-tag" id="hwWasteBadge">+8% de perda técnica</span>
+              </div>
+
+              <div class="tech-memory-box" id="hwTechMemoryBox">
+                <span><strong>Volume Geométrico:</strong> 4.80 m³</span>
+                <span><strong>Água Amassamento:</strong> ~840 L (a/c 0.55)</span>
+                <span><strong>Taxa Aço:</strong> 85 kg/m³</span>
+              </div>
+
+              <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Insumo Técnico</th>
+                      <th>Norma / Traço</th>
+                      <th>Qtd. Final</th>
+                      <th>Unid.</th>
+                      <th>Preço Unit. (R$)</th>
+                      <th>Subtotal</th>
+                      <th>Fornecedor</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="hwResultsTable"></tbody>
+                </table>
+              </div>
+
+              <!-- MÃO DE OBRA ENGIN-PRO -->
+              <div class="labor-box no-print">
+                <div style="font-size: 0.82rem; font-weight: 700; color: var(--navy-900);">👷 Mão de Obra Especializada (Carpintaria, Armação & Concretagem)</div>
+                <div class="labor-grid">
+                  <select id="hwLaborMode" class="form-control" onchange="updateHardwareCalc()">
+                    <option value="vol">Cobrança por m³ / m²</option>
+                    <option value="fixed">Valor Fechado (Empreitada)</option>
+                  </select>
+                  <input type="number" id="hwLaborRate" class="form-control" placeholder="Valor R$ (ex: 180.00)" value="0" step="5" min="0" oninput="updateHardwareCalc()">
+                  <div style="font-size: 0.82rem; color: var(--slate-700); font-weight: 600; text-align: right;">
+                    Mão de Obra: <span id="hwLaborDisplay" style="color: var(--navy-800);">R$ 0,00</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="extra-material-bar">
+                <div style="font-size: 0.82rem; font-weight: 600; color: var(--navy-900); margin-bottom: 0.6rem;">+ Inserir Insumo Técnico Personalizado</div>
+                <div class="extra-grid-hw">
+                  <input type="text" id="hwCustomName" class="form-control" placeholder="Nome do Insumo (ex: Espaçador Plástico)">
+                  <input type="text" id="hwCustomSpec" class="form-control" placeholder="Especificação (ex: Cobrimento 2.5cm)">
+                  <input type="number" id="hwCustomQty" class="form-control" placeholder="Qtd Base" step="0.1">
+                  <select id="hwCustomUnit" class="form-control">
+                    <option value="Un">Un</option>
+                    <option value="Sacos">Sacos</option>
+                    <option value="m³">m³</option>
+                    <option value="Kg">Kg</option>
+                    <option value="Metros">Metros</option>
+                  </select>
+                  <input type="number" id="hwCustomPrice" class="form-control" placeholder="Preço Unit. (R$)" step="0.01">
+                  <button type="button" class="btn btn-primary" onclick="addHardwareCustomMaterial()">Incluir</button>
+                </div>
+              </div>
+
+              <div class="summary-footer">
+                <div>
+                  <div class="summary-breakdown">
+                    <span>Materiais: <strong id="hwMatOnlyTotal">R$ 0,00</strong></span>
+                    <span>Mão de Obra: <strong id="hwLabOnlyTotal">R$ 0,00</strong></span>
+                  </div>
+                  <div style="font-size: 1.65rem; font-weight: 700; color: var(--navy-900);" id="hwTotalFooter">R$ 0,00</div>
+                </div>
+                <div style="display: flex; gap: 8px;" class="export-btns">
+                  <button class="btn btn-soft" onclick="prepareAndPrint()">📄 PDF</button>
+                  <button class="btn btn-excel" onclick="exportToExcel('hardware')">📊 Excel</button>
+                  <button class="btn btn-whatsapp" onclick="shareWhatsApp('hardware')">💬 WhatsApp</button>
+                </div>
+              </div>
+
+              <div class="project-action-bar no-print">
+                <button type="button" class="btn btn-terracotta" style="flex: 1;" onclick="addStageToProject('hardware')">➕ Incluir Etapa Estrutural na Obra</button>
+                <button type="button" class="btn btn-primary" onclick="saveSingleBudgetToHistory('hardware')">💾 Salvar no Histórico</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =========================================================
+             3. ORÇAMENTO CONSOLIDADO DA OBRA & HISTÓRICO SALVO
+             ========================================================= -->
+        <div id="page-project-summary" class="sub-page">
+          <div class="page-header no-print">
+            <div>
+              <h2>Orçamento Consolidado & Histórico</h2>
+              <p>Agrupe múltiplas etapas da mesma obra em uma lista única de compras ou consulte orçamentos salvos.</p>
+            </div>
+          </div>
+
+          <div class="clean-card no-print" style="margin-bottom: 1.5rem;">
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--navy-900); margin-bottom: 0.75rem;">Identificação do Projeto / Cliente (Sai no PDF e WhatsApp)</div>
+            <div class="form-grid-2" style="margin-bottom: 0;">
+              <input type="text" id="projectClientName" class="form-control" placeholder="Nome do Cliente ou Obra (ex: Reforma Residencial Sr. João)" oninput="updatePrintHeader()">
+              <input type="text" id="projectAddress" class="form-control" placeholder="Endereço ou Observação (ex: Rua das Flores, 120)" oninput="updatePrintHeader()">
+            </div>
+          </div>
+
+          <div class="clean-card" style="margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 8px;">
+              <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--navy-900);">1. Etapas Adicionadas à Obra Atual</h3>
+              <button class="btn btn-soft no-print" style="font-size: 0.78rem; padding: 5px 10px;" onclick="clearCurrentProject()">🗑️ Limpar Etapas</button>
+            </div>
+
+            <div id="projectStagesList"></div>
+
+            <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--navy-900); margin: 1.5rem 0 0.85rem 0;">2. Lista Unificada de Compras (Materiais Somados)</h3>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Material Consolidado</th>
+                    <th>Qtd. Total</th>
+                    <th>Unid.</th>
+                    <th>Custo Médio Unit.</th>
+                    <th>Subtotal</th>
+                    <th>Fornecedor</th>
+                  </tr>
+                </thead>
+                <tbody id="consolidatedMaterialsTable"></tbody>
+              </table>
+            </div>
+
+            <div class="summary-footer">
+              <div>
+                <div class="summary-breakdown">
+                  <span>Total Materiais: <strong id="projMatTotal">R$ 0,00</strong></span>
+                  <span>Total Mão de Obra: <strong id="projLabTotal">R$ 0,00</strong></span>
+                </div>
+                <div style="font-size: 1.65rem; font-weight: 700; color: var(--navy-900);" id="projGrandTotal">R$ 0,00</div>
+              </div>
+              <div style="display: flex; gap: 8px;" class="export-btns">
+                <button class="btn btn-soft" onclick="prepareAndPrint()">📄 PDF</button>
+                <button class="btn btn-excel" onclick="exportToExcel('project')">📊 Excel</button>
+                <button class="btn btn-whatsapp" onclick="shareWhatsApp('project')">💬 WhatsApp</button>
+              </div>
+            </div>
+
+            <div class="project-action-bar no-print">
+              <button type="button" class="btn btn-primary" style="width: 100%;" onclick="saveConsolidatedProject()">💾 Salvar Obra Completa no Histórico</button>
+            </div>
+          </div>
+
+          <div class="clean-card no-print">
+            <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--navy-900); margin-bottom: 1rem;">3. Histórico de Orçamentos Salvos no Dispositivo</h3>
+            <div id="savedBudgetsHistoryList"></div>
+          </div>
+        </div>
+
+        <!-- =========================================================
+             4. VITRINE DE FORNECEDORES
+             ========================================================= -->
+        <div id="page-lojas-feed" class="sub-page">
+          <div class="page-header">
+            <div>
+              <h2>Fornecedores & Depósitos Locais</h2>
+              <p>Consulte catálogos atualizados para vincular preços aos seus orçamentos.</p>
+            </div>
+            <input type="text" id="searchStore" class="form-control" placeholder="Buscar loja ou material..." style="max-width: 300px;" oninput="renderStoresFeed()">
+          </div>
+          <div class="grid-cards" id="storesFeedGrid"></div>
+        </div>
+
+        <!-- =========================================================
+             5. CADASTRAR LOJA
+             ========================================================= -->
+        <div id="page-create-store" class="sub-page">
+          <div class="page-header">
+            <div>
+              <h2>Cadastrar Novo Fornecedor</h2>
+              <p>Disponibilize seus preços para engenheiros e empreiteiros da região.</p>
+            </div>
+          </div>
+          
+          <div class="clean-card" style="max-width: 680px;">
+            <form id="createStoreForm" onsubmit="handleCreateStore(event)">
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label>Nome Fantasia</label>
+                  <input type="text" id="newStoreName" class="form-control" placeholder="Ex: Depósito Central" required>
+                </div>
+                <div class="form-group">
+                  <label>CNPJ ou CPF</label>
+                  <input type="text" id="newStoreDoc" class="form-control" placeholder="00.000.000/0001-00" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>WhatsApp / Telefone Comercial</label>
+                <input type="text" id="newStorePhone" class="form-control" placeholder="(15) 99999-9999" required>
+              </div>
+              <div class="form-group">
+                <label>Descrição e Área de Entrega</label>
+                <input type="text" id="newStoreDesc" class="form-control" placeholder="Entrega rápida na região. Cimentos, areia, pedra e ferragens." required>
+              </div>
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label>URL da Logomarca</label>
+                  <input type="url" id="newStoreAvatar" class="form-control" value="https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=200&auto=format&fit=crop&q=60" required>
+                </div>
+                <div class="form-group">
+                  <label>URL do Banner</label>
+                  <input type="url" id="newStoreBanner" class="form-control" value="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1000&auto=format&fit=crop&q=60" required>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem;">Publicar Fornecedor</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- =========================================================
+             6. MINHAS LOJAS
+             ========================================================= -->
+        <div id="page-my-stores" class="sub-page">
+          <div class="page-header">
+            <div>
+              <h2>Minhas Lojas Cadastradas</h2>
+              <p>Gerencie o catálogo de preços dos seus estabelecimentos.</p>
+            </div>
+          </div>
+          <div id="myStoresList" class="grid-cards"></div>
+        </div>
+
+        <!-- =========================================================
+             7. DETALHES DA LOJA
+             ========================================================= -->
+        <div id="page-loja-view" class="sub-page">
+          <button class="btn btn-soft" style="margin-bottom: 1.25rem;" onclick="navToPage('page-lojas-feed')">← Voltar para Fornecedores</button>
+          
+          <div class="store-banner-full" id="viewStoreBanner">
+            <img id="viewStoreAvatar" class="store-avatar-full" src="" alt="Logo">
+          </div>
+          
+          <div style="margin-bottom: 2rem; padding: 0 4px;">
+            <h1 id="viewStoreName" style="font-size: 1.65rem; color: var(--navy-900);">Nome da Loja</h1>
+            <p id="viewStoreDoc" style="color: var(--slate-500); font-size: 0.8rem; font-weight: 600;"></p>
+            <p id="viewStoreDesc" style="color: var(--slate-700); font-size: 0.92rem; margin-top: 6px;"></p>
+            <p id="viewStoreContact" style="color: var(--terracotta-600); font-weight: 600; font-size: 0.9rem; margin-top: 6px;"></p>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 8px;">
+            <h3 style="font-size: 1.15rem; color: var(--navy-900);">Catálogo de Materiais</h3>
+            <button id="btnAddProduct" class="btn btn-primary" style="display: none;" onclick="openAddProductModal()">+ Adicionar Material</button>
+          </div>
+
+          <div class="grid-cards" id="viewStoreProductsGrid"></div>
+        </div>
+
+        <!-- RODAPÉ EXCLUSIVO DE IMPRESSÃO / PDF -->
+        <div class="print-only-footer">
+          <div style="display: flex; justify-content: space-between; margin-top: 2rem;">
+            <div style="width: 45%; border-top: 1px solid #334155; padding-top: 6px; text-align: center;">Assinatura do Responsável / Empreiteiro</div>
+            <div style="width: 45%; border-top: 1px solid #334155; padding-top: 6px; text-align: center;">De Acordo do Cliente</div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- BARRA INFERIOR FIXA PARA CELULARES E TABLETS -->
+    <nav class="mobile-bottom-nav">
+      <button class="bottom-nav-item active" id="bnav-calc-quick" onclick="navToPage('page-calc-quick')">
+        <span class="icon">⚡</span>
+        <span>Rápida</span>
+      </button>
+      <button class="bottom-nav-item" id="bnav-calc-hardware" onclick="navToPage('page-calc-hardware')">
+        <span class="icon">🏗️</span>
+        <span>Engin-Pro</span>
+      </button>
+      <button class="bottom-nav-item" id="bnav-project-summary" onclick="navToPage('page-project-summary')">
+        <span class="icon">📋</span>
+        <span>Obra</span>
+        <span class="mobile-badge" id="mobileStageCount">0</span>
+      </button>
+      <button class="bottom-nav-item" id="bnav-lojas-feed" onclick="navToPage('page-lojas-feed')">
+        <span class="icon">🏬</span>
+        <span>Lojas</span>
+      </button>
+      <button class="bottom-nav-item" id="bnav-create-store" onclick="navToPage('page-create-store')">
+        <span class="icon">➕</span>
+        <span>Cadastrar</span>
+      </button>
+    </nav>
+  </div>
+
+  <script>
+    const DB_KEYS = {
+      STORES: 'orceiobras_v6_stores',
+      PRODUCTS: 'orceiobras_v6_products',
+      BUDGETS: 'orceiobras_v6_budgets',
+      CURRENT_STAGES: 'orceiobras_v6_stages'
+    };
+
+    let currentUser = { email: 'engenharia@orceiobras.com' };
+    let currentActiveStoreId = null;
+
+    let quickCustomMaterials = [];
+    let hardwareCustomMaterials = [];
+    let itemOverrides = {}; 
+
+    let lastQuickState = { title: '', measure: 0, unit: 'm²', items: [], matTotal: 0, laborTotal: 0, grandTotal: 0 };
+    let lastHardwareState = { title: '', measure: 0, unit: 'm³', items: [], matTotal: 0, laborTotal: 0, grandTotal: 0 };
+    let lastConsolidatedExport = [];
+
+    function updateOnlineStatus() {
+      const badge = document.getElementById('connectionStatus');
+      const text = document.getElementById('connectionText');
+      const mobStatus = document.getElementById('mobileConnStatus');
+      
+      if (navigator.onLine) {
+        if (badge) badge.classList.remove('offline');
+        if (text) text.innerText = 'Online • Sincronizado';
+        if (mobStatus) { mobStatus.innerText = '● Online'; mobStatus.style.color = '#5EEAD4'; }
+      } else {
+        if (badge) badge.classList.add('offline');
+        if (text) text.innerText = 'Offline • Salvo Localmente';
+        if (mobStatus) { mobStatus.innerText = '● Offline'; mobStatus.style.color = '#FDE047'; }
+      }
+    }
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+
+    function initDatabase() {
+      if (!localStorage.getItem(DB_KEYS.STORES)) {
+        const stores = [
+          {
+            id: 'loja_1',
+            ownerEmail: 'engenharia@orceiobras.com',
+            name: 'ConstruCentral Depósito',
+            doc: '12.345.678/0001-90',
+            phone: '(15) 98765-4321',
+            desc: 'Agregados, cimentos, tijolos, aço CA-50 e estrutura pesada com frota própria.',
+            avatar: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=200&auto=format&fit=crop&q=60',
+            banner: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1000&auto=format&fit=crop&q=60'
+          },
+          {
+            id: 'loja_2',
+            ownerEmail: 'vendas@casaconstrutor.com.br',
+            name: 'Casa do Construtor & Acabamentos',
+            doc: '98.765.432/0001-10',
+            phone: '(15) 99123-4567',
+            desc: 'Tintas acrílicas, pisos cerâmicos, telhas e impermeabilizantes.',
+            avatar: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=200&auto=format&fit=crop&q=60',
+            banner: 'https://images.unsplash.com/photo-1513467535987-fd81bc7d62f8?w=1000&auto=format&fit=crop&q=60'
+          }
+        ];
+        localStorage.setItem(DB_KEYS.STORES, JSON.stringify(stores));
+      }
+
+      if (!localStorage.getItem(DB_KEYS.PRODUCTS)) {
+        const products = [
+          { id: '1', storeId: 'loja_1', name: 'Tijolos Baianos 6 Furos', price: 1.15, category: 'Alvenaria', unit: 'Un' },
+          { id: '2', storeId: 'loja_1', name: 'Bloco Estrutural Concreto (14x19x39)', price: 4.50, category: 'Estrutural', unit: 'Un' },
+          { id: '3', storeId: 'loja_1', name: 'Cimento CP-II (50kg)', price: 34.90, category: 'Aglomerantes', unit: 'Sacos' },
+          { id: '4', storeId: 'loja_1', name: 'Areia Média Lavada', price: 115.00, category: 'Agregados', unit: 'm³' },
+          { id: '5', storeId: 'loja_1', name: 'Brita 1 / Pedrisco', price: 128.00, category: 'Agregados', unit: 'm³' },
+          { id: '6', storeId: 'loja_1', name: 'Vergalhão Aço CA-50 (10mm)', price: 7.80, category: 'Ferragens', unit: 'Kg' },
+          { id: '7', storeId: 'loja_1', name: 'Tábua de Pinus para Fôrma (30cm)', price: 24.00, category: 'Madeiras', unit: 'm²' },
+          { id: '8', storeId: 'loja_2', name: 'Tinta Acrílica Fosca (18L)', price: 289.90, category: 'Pintura', unit: 'Latas' },
+          { id: '9', storeId: 'loja_2', name: 'Telha Cerâmica Romana', price: 2.90, category: 'Telhados', unit: 'Un' },
+          { id: '10', storeId: 'loja_2', name: 'Argamassa Colante AC-II (20kg)', price: 26.50, category: 'Revestimentos', unit: 'Sacos' }
+        ];
+        localStorage.setItem(DB_KEYS.PRODUCTS, JSON.stringify(products));
+      }
+      updateStageCounters();
+    }
+
+    const DB = {
+      get: (key) => JSON.parse(localStorage.getItem(key)) || [],
+      set: (key, data) => localStorage.setItem(key, JSON.stringify(data))
+    };
+
+    function updateStageCounters() {
+      const count = DB.get(DB_KEYS.CURRENT_STAGES).length;
+      const sideBadge = document.getElementById('sidebarStageCount');
+      const mobBadge = document.getElementById('mobileStageCount');
+      if (sideBadge) sideBadge.innerText = count;
+      if (mobBadge) mobBadge.innerText = count;
+    }
+
+    function getSuppliersForMaterial(materialName) {
+      const products = DB.get(DB_KEYS.PRODUCTS);
+      const stores = DB.get(DB_KEYS.STORES);
+      const matches = products.filter(p => 
+        materialName.toLowerCase().includes(p.name.toLowerCase()) || 
+        p.name.toLowerCase().includes(materialName.toLowerCase())
+      );
+
+      return matches.map(m => {
+        const store = stores.find(s => s.id === m.storeId);
+        return {
+          storeId: m.storeId,
+          storeName: store ? store.name : 'Fornecedor Local',
+          price: m.price || 0
+        };
+      });
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      currentUser.email = document.getElementById('loginEmail').value;
+      document.getElementById('view-login').classList.remove('active');
+      document.getElementById('system-app').classList.add('active');
+      document.getElementById('usrName').innerText = currentUser.email;
+      document.getElementById('printRespInfo').innerText = `Responsável Técnico: ${currentUser.email}`;
+      navToPage('page-calc-quick');
+    }
+
+    function logout() {
+      document.getElementById('system-app').classList.remove('active');
+      document.getElementById('view-login').classList.add('active');
+    }
+
+    function navToPage(pageId) {
+      document.querySelectorAll('.main-viewport .sub-page').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.sidebar nav a, .bottom-nav-item').forEach(el => el.classList.remove('active'));
+
+      const targetPage = document.getElementById(pageId);
+      if (targetPage) targetPage.classList.add('active');
+
+      const slug = pageId.replace('page-', '');
+      const sideLink = document.getElementById('link-' + slug);
+      const bnavLink = document.getElementById('bnav-' + slug);
+
+      if (sideLink) sideLink.classList.add('active');
+      if (bnavLink) bnavLink.classList.add('active');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      if (pageId === 'page-lojas-feed') renderStoresFeed();
+      if (pageId === 'page-my-stores') renderMyStores();
+      if (pageId === 'page-calc-quick') runQuickCalc();
+      if (pageId === 'page-calc-hardware') updateHardwareCalc();
+      if (pageId === 'page-project-summary') renderProjectSummaryPage();
+    }
+
+    function handlePriceChange(itemKey, newVal) {
+      if (!itemOverrides[itemKey]) itemOverrides[itemKey] = {};
+      itemOverrides[itemKey].price = parseFloat(newVal) || 0;
+      refreshActiveCalc();
+    }
+
+    function handleSupplierChange(itemKey, selectedValue) {
+      if (!itemOverrides[itemKey]) itemOverrides[itemKey] = {};
+      if (selectedValue === 'manual') {
+        itemOverrides[itemKey].storeName = 'Manual';
+      } else {
+        const [storeName, price] = selectedValue.split('|');
+        itemOverrides[itemKey].storeName = storeName;
+        itemOverrides[itemKey].price = parseFloat(price);
+      }
+      refreshActiveCalc();
+    }
+
+    function refreshActiveCalc() {
+      if (document.getElementById('page-calc-quick').classList.contains('active')) runQuickCalc();
+      if (document.getElementById('page-calc-hardware').classList.contains('active')) updateHardwareCalc();
+    }
+
+    /* =========================================================
+       1. CALCULADORA RÁPIDA (SUPERFÍCIE 2D EXPRESS)
+       ========================================================= */
+    function toggleQuickInputs() {
+      const mode = document.getElementById('qcCalcMode').value;
+      document.getElementById('qcDimsGroup').style.display = (mode === 'dims') ? 'grid' : 'none';
+      document.getElementById('qcDirectGroup').style.display = (mode === 'direct') ? 'block' : 'none';
+      runQuickCalc();
+    }
+
+    function setQuickDims(l, h) {
+      document.getElementById('qcCalcMode').value = 'dims';
+      toggleQuickInputs();
+      document.getElementById('qcLength').value = l;
+      document.getElementById('qcHeight').value = h;
+      runQuickCalc();
+    }
+
+    function addQuickCustomMaterial() {
+      const name = document.getElementById('qcCustomName').value.trim();
+      const qty = parseFloat(document.getElementById('qcCustomQty').value);
+      const unit = document.getElementById('qcCustomUnit').value;
+      const price = parseFloat(document.getElementById('qcCustomPrice').value) || 0;
+
+      if (!name || isNaN(qty) || qty <= 0) {
+        alert('Informe o nome e a quantidade base do material extra.');
+        return;
+      }
+
+      const id = Date.now();
+      quickCustomMaterials.push({ id, name, baseQty: qty, unit });
+      itemOverrides['qc_custom_' + id] = { price: price, storeName: 'Empreiteiro' };
+
+      document.getElementById('qcCustomName').value = '';
+      document.getElementById('qcCustomQty').value = '';
+      document.getElementById('qcCustomPrice').value = '';
+      runQuickCalc();
+    }
+
+    function removeQuickCustomMaterial(id) {
+      quickCustomMaterials = quickCustomMaterials.filter(m => m.id !== id);
+      delete itemOverrides['qc_custom_' + id];
+      runQuickCalc();
+    }
+
+    function runQuickCalc() {
+      const typeSelect = document.getElementById('qcType');
+      const type = typeSelect.value;
+      const typeLabel = typeSelect.options[typeSelect.selectedIndex].text;
+      const mode = document.getElementById('qcCalcMode').value;
+      const wastePercent = parseFloat(document.getElementById('qcWasteInput').value) || 0;
+      const wasteFactor = 1 + (wastePercent / 100);
+      
+      document.getElementById('qcLcdService').innerText = type.toUpperCase();
+      document.getElementById('qcLcdWaste').innerText = `PERDA: ${wastePercent}%`;
+      document.getElementById('qcWasteBadge').innerText = `+${wastePercent}% de sobra incluída`;
+
+      let totalArea = 0;
+      if (mode === 'dims') {
+        const len = parseFloat(document.getElementById('qcLength').value) || 0;
+        const height = parseFloat(document.getElementById('qcHeight').value) || 0;
+        totalArea = len * height;
+      } else {
+        totalArea = parseFloat(document.getElementById('qcVal').value) || 0;
+      }
+
+      document.getElementById('qcLcdArea').innerText = `${totalArea.toFixed(2)} m²`;
+
+      let baseItems = [];
+
+      if (type === 'tijolos') {
+        baseItems = [
+          { key: 'qc_tijolo', name: 'Tijolos Baianos 6 Furos', qty: Math.ceil(totalArea * 25 * wasteFactor), unit: 'Un', isCustom: false },
+          { key: 'qc_cimento', name: 'Cimento CP-II (50kg)', qty: Math.ceil(totalArea * 0.15 * wasteFactor), unit: 'Sacos', isCustom: false },
+          { key: 'qc_areia', name: 'Areia Média Lavada', qty: (totalArea * 0.04 * wasteFactor).toFixed(2), unit: 'm³', isCustom: false }
+        ];
+      } else if (type === 'piso') {
+        baseItems = [
+          { key: 'qc_cimento', name: 'Cimento CP-II (50kg)', qty: Math.ceil(totalArea * 0.22 * wasteFactor), unit: 'Sacos', isCustom: false },
+          { key: 'qc_areia', name: 'Areia Média Lavada', qty: (totalArea * 0.035 * wasteFactor).toFixed(2), unit: 'm³', isCustom: false }
+        ];
+      } else if (type === 'pintura') {
+        baseItems = [
+          { key: 'qc_tinta', name: 'Tinta Acrílica Fosca (18L)', qty: Math.ceil((totalArea / 90) * wasteFactor), unit: 'Latas', isCustom: false },
+          { key: 'qc_selador', name: 'Selador Acrílico (18L)', qty: Math.ceil((totalArea / 110) * wasteFactor), unit: 'Latas', isCustom: false },
+          { key: 'qc_lixa', name: 'Lixa Massa Grão 150', qty: Math.ceil((totalArea / 5) * wasteFactor), unit: 'Un', isCustom: false }
+        ];
+      } else if (type === 'telhado') {
+        baseItems = [
+          { key: 'qc_telha', name: 'Telha Cerâmica Romana', qty: Math.ceil(totalArea * 16 * wasteFactor), unit: 'Un', isCustom: false },
+          { key: 'qc_ripa', name: 'Ripa de Madeira (5m)', qty: Math.ceil(totalArea * 0.7 * wasteFactor), unit: 'Un', isCustom: false },
+          { key: 'qc_caibro', name: 'Caibro Estrutural (5m)', qty: Math.ceil(totalArea * 0.4 * wasteFactor), unit: 'Un', isCustom: false }
+        ];
+      } else if (type === 'ceramica') {
+        baseItems = [
+          { key: 'qc_revest', name: 'Piso Cerâmico / Porcelanato', qty: (totalArea * wasteFactor).toFixed(2), unit: 'm²', isCustom: false },
+          { key: 'qc_argamassa', name: 'Argamassa Colante AC-II (20kg)', qty: Math.ceil((totalArea / 4) * wasteFactor), unit: 'Sacos', isCustom: false },
+          { key: 'qc_rejunte', name: 'Rejunte Flexível (1kg)', qty: Math.ceil((totalArea / 3) * wasteFactor), unit: 'Kg', isCustom: false }
+        ];
+      }
+
+      quickCustomMaterials.forEach(cm => {
+        baseItems.push({
+          id: cm.id, key: 'qc_custom_' + cm.id, name: cm.name,
+          qty: (cm.baseQty * wasteFactor).toFixed(2), unit: cm.unit, isCustom: true
+        });
+      });
+
+      let matTotal = 0;
+      const computedItems = [];
+
+      document.getElementById('qcResultTable').innerHTML = baseItems.map(item => {
+        const suppliers = getSuppliersForMaterial(item.name);
+        const override = itemOverrides[item.key];
+        
+        let currentPrice = 0;
+        let currentSupplier = 'Manual';
+
+        if (override && override.price !== undefined) {
+          currentPrice = override.price;
+          currentSupplier = override.storeName || 'Manual';
+        } else if (suppliers.length > 0) {
+          currentPrice = suppliers[0].price;
+          currentSupplier = suppliers[0].storeName;
+        }
+
+        const subtotal = parseFloat(item.qty) * currentPrice;
+        matTotal += subtotal;
+
+        computedItems.push({
+          material: item.name, qtd: parseFloat(item.qty), unidade: item.unit,
+          precoUnit: currentPrice, subtotal: subtotal, fornecedor: currentSupplier
+        });
+
+        let supplierSelectHtml = `<select class="select-origin" onchange="handleSupplierChange('${item.key}', this.value)">`;
+        if (suppliers.length > 0) {
+          suppliers.forEach(sup => {
+            const isSelected = (currentSupplier === sup.storeName) ? 'selected' : '';
+            supplierSelectHtml += `<option value="${sup.storeName}|${sup.price}" ${isSelected}>${sup.storeName}</option>`;
+          });
+        }
+        supplierSelectHtml += `<option value="manual" ${currentSupplier === 'Manual' || item.isCustom ? 'selected' : ''}>Manual</option>`;
+        supplierSelectHtml += `</select>`;
+
+        return `
+          <tr>
+            <td data-label="Material">
+              <strong>${item.name}</strong>
+              ${item.isCustom ? '<span class="badge-tag badge-extra" style="margin-left:4px;">Extra</span>' : ''}
+            </td>
+            <td data-label="Qtd. Final"><span class="qty-highlight">${item.qty}</span></td>
+            <td data-label="Unidade">${item.unit}</td>
+            <td data-label="Preço Unit. (R$)"><input type="number" class="input-price" value="${currentPrice.toFixed(2)}" step="0.01" min="0" oninput="handlePriceChange('${item.key}', this.value)"></td>
+            <td data-label="Subtotal"><strong>R$ ${subtotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong></td>
+            <td data-label="Fornecedor">${supplierSelectHtml}</td>
+            ${item.isCustom ? `<td data-label="Ação"><button class="btn-remove" onclick="removeQuickCustomMaterial(${item.id})">Remover</button></td>` : '<td style="display:none;"></td>'}
+          </tr>
+        `;
+      }).join('');
+
+      const laborMode = document.getElementById('qcLaborMode').value;
+      const laborRate = parseFloat(document.getElementById('qcLaborRate').value) || 0;
+      const laborTotal = (laborMode === 'unit') ? (totalArea * laborRate) : laborRate;
+      const grandTotal = matTotal + laborTotal;
+
+      document.getElementById('qcLaborDisplay').innerText = `R$ ${laborTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+      document.getElementById('qcMatOnlyTotal').innerText = `R$ ${matTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+      document.getElementById('qcLabOnlyTotal').innerText = `R$ ${laborTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+
+      const formattedGrand = `R$ ${grandTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+      document.getElementById('qcTotalPrice').innerText = formattedGrand;
+      document.getElementById('qcLcdCost').innerText = `TOTAL: ${formattedGrand}`;
+
+      lastQuickState = {
+        title: typeLabel,
+        measure: totalArea,
+        unit: 'm²',
+        items: computedItems,
+        matTotal: matTotal,
+        laborTotal: laborTotal,
+        grandTotal: grandTotal
+      };
+    }
+
+    /* =========================================================
+       2. ENGIN-PRO (CÁLCULO ESTRUTURAL & VOLUMÉTRICO 3D)
+       ========================================================= */
+    function onHwElementChange() {
+      const type = document.getElementById('hwType').value;
+      const lbl1 = document.getElementById('hwLblDim1');
+      const lbl2 = document.getElementById('hwLblDim2');
+      const lbl3 = document.getElementById('hwLblDim3');
+      const dim1 = document.getElementById('hwDim1');
+      const dim2 = document.getElementById('hwDim2');
+      const dim3 = document.getElementById('hwDim3');
+      const steelSelect = document.getElementById('hwSteelRate');
+      const paramLabel = document.getElementById('hwEngParamLabel');
+
+      if (type === 'laje_macica') {
+        lbl1.innerText = 'Comprimento (m)';
+        lbl2.innerText = 'Largura (m)';
+        lbl3.innerText = 'Espessura (cm)';
+        dim1.value = 8.0; dim2.value = 5.0; dim3.value = 12;
+        paramLabel.innerText = '3. Densidade de Aço';
+        steelSelect.disabled = false;
+        steelSelect.value = '85';
+      } else if (type === 'vigas_pilares') {
+        lbl1.innerText = 'Extensão Total (m)';
+        lbl2.innerText = 'Altura Seção (m)';
+        lbl3.innerText = 'Largura Base (cm)';
+        dim1.value = 25.0; dim2.value = 0.40; dim3.value = 15;
+        paramLabel.innerText = '3. Densidade de Aço';
+        steelSelect.disabled = false;
+        steelSelect.value = '110';
+      } else if (type === 'sapata_baldrame') {
+        lbl1.innerText = 'Perímetro Baldrame (m)';
+        lbl2.innerText = 'Altura Viga (m)';
+        lbl3.innerText = 'Largura Vala (cm)';
+        dim1.value = 32.0; dim2.value = 0.35; dim3.value = 20;
+        paramLabel.innerText = '3. Densidade de Aço';
+        steelSelect.disabled = false;
+        steelSelect.value = '65';
+      } else if (type === 'alvenaria_estrutural') {
+        lbl1.innerText = 'Comprimento Parede (m)';
+        lbl2.innerText = 'Pé-Direito (m)';
+        lbl3.innerText = 'Espessura Bloco (cm)';
+        dim1.value = 12.0; dim2.value = 2.80; dim3.value = 14;
+        paramLabel.innerText = '3. Armadura Graute';
+        steelSelect.disabled = false;
+        steelSelect.value = '65';
+      } else if (type === 'reboco_tecnico') {
+        lbl1.innerText = 'Comprimento (m)';
+        lbl2.innerText = 'Altura (m)';
+        lbl3.innerText = 'Espessura Massa (mm)';
+        dim1.value = 15.0; dim2.value = 2.80; dim3.value = 20;
+        paramLabel.innerText = '3. Armadura (N/A)';
+        steelSelect.value = '0';
+        steelSelect.disabled = true;
+      }
+      updateHardwareCalc();
+    }
+
+    function applyEnginPreset(type, d1, d2, d3, steel) {
+      document.getElementById('hwType').value = type;
+      onHwElementChange();
+      document.getElementById('hwDim1').value = d1;
+      document.getElementById('hwDim2').value = d2;
+      document.getElementById('hwDim3').value = d3;
+      document.getElementById('hwSteelRate').value = steel.toString();
+      updateHardwareCalc();
+    }
+
+    function addHardwareCustomMaterial() {
+      const name = document.getElementById('hwCustomName').value.trim();
+      const spec = document.getElementById('hwCustomSpec').value.trim() || 'Norma Técnica';
+      const qty = parseFloat(document.getElementById('hwCustomQty').value);
+      const unit = document.getElementById('hwCustomUnit').value;
+      const price = parseFloat(document.getElementById('hwCustomPrice').value) || 0;
+
+      if (!name || isNaN(qty) || qty <= 0) {
+        alert('Informe o nome e uma quantidade base válida.');
+        return;
+      }
+
+      const id = Date.now();
+      hardwareCustomMaterials.push({ id, name, spec, baseQty: qty, unit });
+      itemOverrides['hw_custom_' + id] = { price: price, storeName: 'Empreiteiro' };
+
+      document.getElementById('hwCustomName').value = '';
+      document.getElementById('hwCustomSpec').value = '';
+      document.getElementById('hwCustomQty').value = '';
+      document.getElementById('hwCustomPrice').value = '';
+      updateHardwareCalc();
+    }
+
+    function removeHardwareCustomMaterial(id) {
+      hardwareCustomMaterials = hardwareCustomMaterials.filter(m => m.id !== id);
+      delete itemOverrides['hw_custom_' + id];
+      updateHardwareCalc();
+    }
+
+    function updateHardwareCalc() {
+      const typeSelect = document.getElementById('hwType');
+      const type = typeSelect.value;
+      const typeLabel = typeSelect.options[typeSelect.selectedIndex].text;
+
+      const d1 = parseFloat(document.getElementById('hwDim1').value) || 0;
+      const d2 = parseFloat(document.getElementById('hwDim2').value) || 0;
+      const d3 = parseFloat(document.getElementById('hwDim3').value) || 0;
+      const steelDensity = parseFloat(document.getElementById('hwSteelRate').value) || 0;
+      const wastePercent = parseFloat(document.getElementById('hwWaste').value) || 0;
+      const wasteFactor = 1 + (wastePercent / 100);
+
+      const area = d1 * d2;
+      let volume = 0;
+      let primaryMeasure = 0;
+      let primaryUnit = 'm³';
+      let baseItems = [];
+      let traceDisplay = '';
+      let waterLiters = 0;
+
+      if (type === 'laje_macica') {
+        volume = area * (d3 / 100);
+        primaryMeasure = volume;
+        primaryUnit = 'm³';
+        traceDisplay = 'FCK 25 MPA • 1:2:3';
+        waterLiters = Math.round(volume * 185);
+        const steelKg = Math.ceil(volume * steelDensity * wasteFactor);
+
+        baseItems = [
+          { key: 'hw_cimento', name: 'Cimento CP-II (50kg)', spec: 'Traço 1:2:3 (350kg/m³)', qty: Math.ceil(volume * 7 * wasteFactor), unit: 'Sacos', isCustom: false },
+          { key: 'hw_areia', name: 'Areia Média Lavada', spec: 'Agregado Miúdo', qty: (volume * 0.56 * wasteFactor).toFixed(2), unit: 'm³', isCustom: false },
+          { key: 'hw_brita', name: 'Brita 1 / Pedrisco', spec: 'Agregado Graúdo', qty: (volume * 0.84 * wasteFactor).toFixed(2), unit: 'm³', isCustom: false },
+          { key: 'hw_aco', name: 'Vergalhão Aço CA-50 (10mm)', spec: `Taxa ${steelDensity} kg/m³`, qty: steelKg, unit: 'Kg', isCustom: false },
+          { key: 'hw_arame', name: 'Arame Recozido Nº 18', spec: 'Amarração Armadura', qty: Math.ceil(steelKg * 0.025), unit: 'Kg', isCustom: false }
+        ];
+      } else if (type === 'vigas_pilares') {
+        volume = area * (d3 / 100);
+        primaryMeasure = volume;
+        primaryUnit = 'm³';
+        traceDisplay = 'FCK 30 MPA • 1:1.5:2.5';
+        waterLiters = Math.round(volume * 195);
+        const steelKg = Math.ceil(volume * steelDensity * wasteFactor);
+        const formworkArea = ((d2 * 2) + (d3 / 100)) * d1;
+
+        baseItems = [
+          { key: 'hw_cimento', name: 'Cimento CP-II (50kg)', spec: 'Traço 1:1.5:2.5 (420kg/m³)', qty: Math.ceil(volume * 8.4 * wasteFactor), unit: 'Sacos', isCustom: false },
+          { key: 'hw_areia', name: 'Areia Média Lavada', spec: 'Agregado Miúdo', qty: (volume * 0.50 * wasteFactor).toFixed(2), unit: 'm³', isCustom: false },
+          { key: 'hw_brita', name: 'Brita 1 / Pedrisco', spec: 'Agregado Graúdo', qty: (volume * 0.78 * wasteFactor).toFixed(2), unit: 'm³', isCustom: false },
+          { key: 'hw_aco', name: 'Vergalhão Aço CA-50 (10mm)', spec: `Armadura ${steelDensity} kg/m³`, qty: steelKg, unit: 'Kg', isCustom: false },
+          { key: 'hw_forma', name: 'Tábua de Pinus para Fôrma (30cm)', spec: 'Caixaria 3 faces', qty: (formworkArea * wasteFactor).toFixed(2), unit: 'm²', isCustom: false }
+        ];
+      } else if (type === 'sapata_baldrame') {
+        volume = area * (d3 / 100);
+        primaryMeasure = volume;
+        primaryUnit = 'm³';
+        traceDisplay = 'FUNDAÇÃO • FCK 25 MPA';
+        waterLiters = Math.round(volume * 180);
+        const steelKg = Math.ceil(volume * steelDensity * wasteFactor);
+        const impermArea = d1 * ((d2 * 2) + (d3 / 100));
+
+        baseItems = [
+          { key: 'hw_cimento', name: 'Cimento CP-II (50kg)', spec: 'Concreto Fundação', qty: Math.ceil(volume * 7 * wasteFactor), unit: 'Sacos', isCustom: false },
+          { key: 'hw_areia', name: 'Areia Média Lavada', spec: 'Agregado Miúdo', qty: (volume * 0.56 * wasteFactor).toFixed(2), unit: 'm³', isCustom: false },
+          { key: 'hw_brita', name: 'Brita 1 / Pedrisco', spec: 'Lastro + Concreto', qty: (volume * 0.92 * wasteFactor).toFixed(2), unit: 'm³', isCustom: false },
+          { key: 'hw_aco', name: 'Vergalhão Aço CA-50 (10mm)', spec: `Armadura ${steelDensity} kg/m³`, qty: steelKg, unit: 'Kg', isCustom: false },
+          { key: 'hw_neutrol', name: 'Impermeabilizante Asfáltico (18L)', spec: 'Pintura Baldrame (3 demãos)', qty: Math.ceil((impermArea * 0.45) / 18), unit: 'Latas', isCustom: false }
+        ];
+      } else if (type === 'alvenaria_estrutural') {
+        primaryMeasure = area;
+        primaryUnit = 'm²';
+        volume = area * 0.025;
+        traceDisplay = 'ALV. ESTRUTURAL • NBR 16868';
+        waterLiters = Math.round(area * 6.5);
+        const steelKg = Math.ceil(volume * steelDensity * wasteFactor);
+
+        baseItems = [
+          { key: 'hw_bloco_conc', name: 'Bloco Estrutural Concreto (14x19x39)', spec: '12.5 blocos/m²', qty: Math.ceil(area * 12.5 * wasteFactor), unit: 'Un', isCustom: false },
+          { key: 'hw_cimento', name: 'Cimento CP-II (50kg)', spec: 'Assentamento + Graute', qty: Math.ceil(area * 0.30 * wasteFactor), unit: 'Sacos', isCustom: false },
+          { key: 'hw_areia', name: 'Areia Média Lavada', spec: 'Junta 10mm + Graute', qty: (area * 0.055 * wasteFactor).toFixed(2), unit: 'm³', isCustom: false },
+          { key: 'hw_aco', name: 'Vergalhão Aço CA-50 (10mm)', spec: 'Pontos de Grauteamento', qty: steelKg, unit: 'Kg', isCustom: false }
+        ];
+      } else if (type === 'reboco_tecnico') {
+        volume = area * (d3 / 1000);
+        primaryMeasure = area;
+        primaryUnit = 'm²';
+        traceDisplay = `REBOCO ${d3}MM • 1:2:8`;
+        waterLiters = Math.round(volume * 210);
+
+        baseItems = [
+          { key: 'hw_cimento', name: 'Cimento CP-II (50kg)', spec: 'Traço 1:2:8 (Aglomerante)', qty: Math.ceil(volume * 4.2 * wasteFactor), unit: 'Sacos', isCustom: false },
+          { key: 'hw_cal', name: 'Cal Hidratada CH-III (20kg)', spec: 'Plasticidade Argamassa', qty: Math.ceil(volume * 8.5 * wasteFactor), unit: 'Sacos', isCustom: false },
+          { key: 'hw_areia', name: 'Areia Média Lavada', spec: 'Areia Peneirada', qty: (volume * 1.15 * wasteFactor).toFixed(2), unit: 'm³', isCustom: false }
+        ];
+      }
+
+      hardwareCustomMaterials.forEach(hm => {
+        baseItems.push({
+          id: hm.id, key: 'hw_custom_' + hm.id, name: hm.name, spec: hm.spec,
+          qty: (hm.baseQty * wasteFactor).toFixed(2), unit: hm.unit, isCustom: true
+        });
+      });
+
+      document.getElementById('hwLcdTrace').innerText = traceDisplay;
+      document.getElementById('hwLcdSteel').innerText = steelDensity > 0 ? `AÇO: ${steelDensity} KG/M³` : `ESP: ${d3} MM`;
+      document.getElementById('screenPrimaryReadout').innerText = `${primaryMeasure.toFixed(2)} ${primaryUnit}`;
+      document.getElementById('hwWasteBadge').innerText = `+${wastePercent}% de perda técnica`;
+
+      document.getElementById('hwTechMemoryBox').innerHTML = `
+        <span><strong>Área Base:</strong> ${area.toFixed(2)} m²</span>
+        <span><strong>Volume Real:</strong> ${volume.toFixed(3)} m³</span>
+        <span><strong>Água Amassamento:</strong> ~${waterLiters} L</span>
+      `;
+
+      let matTotal = 0;
+      const computedItems = [];
+
+      document.getElementById('hwResultsTable').innerHTML = baseItems.map(item => {
+        const suppliers = getSuppliersForMaterial(item.name);
+        const override = itemOverrides[item.key];
+        
+        let currentPrice = 0;
+        let currentSupplier = 'Manual';
+
+        if (override && override.price !== undefined) {
+          currentPrice = override.price;
+          currentSupplier = override.storeName || 'Manual';
+        } else if (suppliers.length > 0) {
+          currentPrice = suppliers[0].price;
+          currentSupplier = suppliers[0].storeName;
+        }
+
+        const subtotal = parseFloat(item.qty) * currentPrice;
+        matTotal += subtotal;
+
+        computedItems.push({
+          material: item.name, especificacao: item.spec, qtd: parseFloat(item.qty), unidade: item.unit,
+          precoUnit: currentPrice, subtotal: subtotal, fornecedor: currentSupplier
+        });
+
+        let supplierSelectHtml = `<select class="select-origin" onchange="handleSupplierChange('${item.key}', this.value)">`;
+        if (suppliers.length > 0) {
+          suppliers.forEach(sup => {
+            const isSelected = (currentSupplier === sup.storeName) ? 'selected' : '';
+            supplierSelectHtml += `<option value="${sup.storeName}|${sup.price}" ${isSelected}>${sup.storeName}</option>`;
+          });
+        }
+        supplierSelectHtml += `<option value="manual" ${currentSupplier === 'Manual' || item.isCustom ? 'selected' : ''}>Manual</option>`;
+        supplierSelectHtml += `</select>`;
+
+        return `
+          <tr>
+            <td data-label="Insumo Técnico">
+              <strong>${item.name}</strong>
+              ${item.isCustom ? '<span class="badge-tag badge-extra" style="margin-left:4px;">Extra</span>' : ''}
+            </td>
+            <td data-label="Norma / Traço" style="color:var(--slate-500); font-size:0.8rem;">${item.spec}</td>
+            <td data-label="Qtd. Final"><span class="qty-highlight">${item.qty}</span></td>
+            <td data-label="Unidade">${item.unit}</td>
+            <td data-label="Preço Unit. (R$)"><input type="number" class="input-price" value="${currentPrice.toFixed(2)}" step="0.01" min="0" oninput="handlePriceChange('${item.key}', this.value)"></td>
+            <td data-label="Subtotal"><strong>R$ ${subtotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong></td>
+            <td data-label="Fornecedor">${supplierSelectHtml}</td>
+            ${item.isCustom ? `<td data-label="Ação"><button class="btn-remove" onclick="removeHardwareCustomMaterial(${item.id})">Remover</button></td>` : '<td style="display:none;"></td>'}
+          </tr>
+        `;
+      }).join('');
+
+      const laborMode = document.getElementById('hwLaborMode').value;
+      const laborRate = parseFloat(document.getElementById('hwLaborRate').value) || 0;
+      const laborTotal = (laborMode === 'vol') ? (primaryMeasure * laborRate) : laborRate;
+      const grandTotal = matTotal + laborTotal;
+
+      document.getElementById('hwLaborDisplay').innerText = `R$ ${laborTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+      document.getElementById('hwMatOnlyTotal').innerText = `R$ ${matTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+      document.getElementById('hwLabOnlyTotal').innerText = `R$ ${laborTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+
+      const formattedGrand = `R$ ${grandTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+      document.getElementById('screenSecondaryReadout').innerText = `ÁREA: ${area.toFixed(1)}m² • ${formattedGrand}`;
+      document.getElementById('hwTotalFooter').innerText = formattedGrand;
+
+      lastHardwareState = {
+        title: typeLabel,
+        measure: primaryMeasure,
+        unit: primaryUnit,
+        items: computedItems,
+        matTotal: matTotal,
+        laborTotal: laborTotal,
+        grandTotal: grandTotal
+      };
+    }
+
+    /* =========================================================
+       ORÇAMENTO CONSOLIDADO & HISTÓRICO
+       ========================================================= */
+    function addStageToProject(source) {
+      const state = (source === 'quick') ? lastQuickState : lastHardwareState;
+      const stages = DB.get(DB_KEYS.CURRENT_STAGES);
+
+      stages.push({
+        id: Date.now(),
+        title: `${state.title} (${state.measure.toFixed(2)} ${state.unit})`,
+        items: state.items,
+        matTotal: state.matTotal,
+        laborTotal: state.laborTotal,
+        grandTotal: state.grandTotal
+      });
+
+      DB.set(DB_KEYS.CURRENT_STAGES, stages);
+      updateStageCounters();
+      alert(`Etapa "${state.title}" incluída no Orçamento Consolidado da Obra!`);
+    }
+
+    function removeProjectStage(id) {
+      const stages = DB.get(DB_KEYS.CURRENT_STAGES).filter(s => s.id !== id);
+      DB.set(DB_KEYS.CURRENT_STAGES, stages);
+      updateStageCounters();
+      renderProjectSummaryPage();
+    }
+
+    function clearCurrentProject() {
+      if (!confirm('Deseja remover todas as etapas da obra atual?')) return;
+      DB.set(DB_KEYS.CURRENT_STAGES, []);
+      updateStageCounters();
+      renderProjectSummaryPage();
+    }
+
+    function renderProjectSummaryPage() {
+      const stages = DB.get(DB_KEYS.CURRENT_STAGES);
+      const stagesContainer = document.getElementById('projectStagesList');
+
+      if (stages.length === 0) {
+        stagesContainer.innerHTML = '<p style="color: var(--slate-500); font-size: 0.86rem;">Nenhuma etapa adicionada ainda. Use o botão <strong>"➕ Incluir Etapa no Orçamento da Obra"</strong> nas calculadoras.</p>';
+      } else {
+        stagesContainer.innerHTML = stages.map(st => `
+          <div class="stage-pill">
+            <div>
+              <strong style="color: var(--navy-900); font-size: 0.9rem;">${st.title}</strong>
+              <div style="font-size: 0.78rem; color: var(--slate-500); margin-top: 2px;">
+                Materiais: R$ ${st.matTotal.toLocaleString('pt-BR', {minimumFractionDigits:2})} • Mão de Obra: R$ ${st.laborTotal.toLocaleString('pt-BR', {minimumFractionDigits:2})}
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <strong style="color: var(--terracotta-600);">R$ ${st.grandTotal.toLocaleString('pt-BR', {minimumFractionDigits:2})}</strong>
+              <button class="btn-remove no-print" onclick="removeProjectStage(${st.id})">✕</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      const consolidatedMap = {};
+      let totalMat = 0;
+      let totalLab = 0;
+
+      stages.forEach(st => {
+        totalMat += st.matTotal;
+        totalLab += st.laborTotal;
+
+        st.items.forEach(it => {
+          const mapKey = `${it.material.toLowerCase()}_${it.unidade.toLowerCase()}`;
+          if (!consolidatedMap[mapKey]) {
+            consolidatedMap[mapKey] = {
+              material: it.material,
+              qtd: 0,
+              unidade: it.unidade,
+              subtotal: 0,
+              fornecedor: it.fornecedor
+            };
+          }
+          consolidatedMap[mapKey].qtd += parseFloat(it.qtd);
+          consolidatedMap[mapKey].subtotal += it.subtotal;
+        });
+      });
+
+      const consolidatedArray = Object.values(consolidatedMap);
+      lastConsolidatedExport = consolidatedArray.map(c => ({
+        material: c.material,
+        qtd: Number.isInteger(c.qtd) ? c.qtd : c.qtd.toFixed(2),
+        unidade: c.unidade,
+        precoUnit: c.qtd > 0 ? (c.subtotal / c.qtd) : 0,
+        subtotal: c.subtotal,
+        fornecedor: c.fornecedor
+      }));
+
+      const tableBody = document.getElementById('consolidatedMaterialsTable');
+      if (lastConsolidatedExport.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--slate-500);">Aguardando etapas para consolidar materiais.</td></tr>';
+      } else {
+        tableBody.innerHTML = lastConsolidatedExport.map(row => `
+          <tr>
+            <td data-label="Material"><strong>${row.material}</strong></td>
+            <td data-label="Qtd. Total"><span class="qty-highlight">${row.qtd}</span></td>
+            <td data-label="Unidade">${row.unidade}</td>
+            <td data-label="Custo Médio">R$ ${row.precoUnit.toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
+            <td data-label="Subtotal"><strong>R$ ${row.subtotal.toLocaleString('pt-BR', {minimumFractionDigits:2})}</strong></td>
+            <td data-label="Fornecedor"><span class="badge-tag badge-extra">${row.fornecedor}</span></td>
+          </tr>
+        `).join('');
+      }
+
+      const grandTotal = totalMat + totalLab;
+      document.getElementById('projMatTotal').innerText = `R$ ${totalMat.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+      document.getElementById('projLabTotal').innerText = `R$ ${totalLab.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+      document.getElementById('projGrandTotal').innerText = `R$ ${grandTotal.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+
+      renderSavedHistoryList();
+    }
+
+    function saveSingleBudgetToHistory(source) {
+      const state = (source === 'quick') ? lastQuickState : lastHardwareState;
+      const clientName = prompt('Identificação do Cliente ou Obra para salvar:', `${state.title}`);
+      if (!clientName) return;
+
+      const budgets = DB.get(DB_KEYS.BUDGETS);
+      budgets.unshift({
+        id: Date.now(),
+        title: clientName,
+        date: new Date().toLocaleDateString('pt-BR'),
+        matTotal: state.matTotal,
+        laborTotal: state.laborTotal,
+        grandTotal: state.grandTotal,
+        items: state.items
+      });
+      DB.set(DB_KEYS.BUDGETS, budgets);
+      alert('Orçamento salvo no Histórico com sucesso!');
+    }
+
+    function saveConsolidatedProject() {
+      const stages = DB.get(DB_KEYS.CURRENT_STAGES);
+      if (stages.length === 0) {
+        alert('Adicione pelo menos uma etapa antes de salvar.');
+        return;
+      }
+      const clientInput = document.getElementById('projectClientName').value.trim();
+      const title = clientInput || `Obra Consolidada (${stages.length} etapas)`;
+
+      let matTotal = 0, laborTotal = 0;
+      stages.forEach(s => { matTotal += s.matTotal; laborTotal += s.laborTotal; });
+
+      const budgets = DB.get(DB_KEYS.BUDGETS);
+      budgets.unshift({
+        id: Date.now(),
+        title: title,
+        date: new Date().toLocaleDateString('pt-BR'),
+        matTotal: matTotal,
+        laborTotal: laborTotal,
+        grandTotal: matTotal + laborTotal,
+        items: lastConsolidatedExport
+      });
+      DB.set(DB_KEYS.BUDGETS, budgets);
+      renderSavedHistoryList();
+      alert('Obra completa salva no Histórico!');
+    }
+
+    function deleteSavedBudget(id) {
+      const budgets = DB.get(DB_KEYS.BUDGETS).filter(b => b.id !== id);
+      DB.set(DB_KEYS.BUDGETS, budgets);
+      renderSavedHistoryList();
+    }
+
+    function renderSavedHistoryList() {
+      const budgets = DB.get(DB_KEYS.BUDGETS);
+      const container = document.getElementById('savedBudgetsHistoryList');
+
+      if (budgets.length === 0) {
+        container.innerHTML = '<p style="color: var(--slate-500); font-size: 0.86rem;">Nenhum orçamento salvo no histórico ainda.</p>';
+        return;
+      }
+
+      container.innerHTML = budgets.map(b => `
+        <div class="stage-pill">
+          <div>
+            <strong style="color: var(--navy-900); font-size: 0.92rem;">${b.title}</strong>
+            <div style="font-size: 0.78rem; color: var(--slate-500); margin-top: 2px;">
+              Salvo em ${b.date} • ${b.items.length} itens • Mat: R$ ${(b.matTotal || 0).toLocaleString('pt-BR', {minimumFractionDigits:2})} + M.O: R$ ${(b.laborTotal || 0).toLocaleString('pt-BR', {minimumFractionDigits:2})}
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <strong style="color: var(--navy-800); font-size: 0.95rem;">R$ ${(b.grandTotal || 0).toLocaleString('pt-BR', {minimumFractionDigits:2})}</strong>
+            <button class="btn-remove" onclick="deleteSavedBudget(${b.id})">Excluir</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    /* =========================================================
+       EXPORTAÇÕES E IMPRESSÃO PDF PROFISSIONAL
+       ========================================================= */
+    function updatePrintHeader() {
+      const client = document.getElementById('projectClientName')?.value.trim() || 'Cliente / Obra Geral';
+      const addr = document.getElementById('projectAddress')?.value.trim();
+      document.getElementById('printClientInfo').innerText = addr ? `Cliente / Obra: ${client} — ${addr}` : `Cliente / Obra: ${client}`;
+      document.getElementById('printDate').innerText = new Date().toLocaleDateString('pt-BR');
+    }
+
+    function prepareAndPrint() {
+      updatePrintHeader();
+      window.print();
+    }
+
+    function exportToExcel(source) {
+      let data = [];
+      let laborTotal = 0;
+
+      if (source === 'quick') { data = lastQuickState.items; laborTotal = lastQuickState.laborTotal; }
+      else if (source === 'hardware') { data = lastHardwareState.items; laborTotal = lastHardwareState.laborTotal; }
+      else {
+        data = lastConsolidatedExport;
+        DB.get(DB_KEYS.CURRENT_STAGES).forEach(s => laborTotal += s.laborTotal);
+      }
+
+      if (!data.length) return;
+
+      let csvContent = "\uFEFFMaterial/Insumo;Quantidade Final;Unidade;Preco Unitario (R$);Subtotal (R$);Fornecedor\n";
+      let matTotal = 0;
+
+      data.forEach(row => {
+        matTotal += row.subtotal;
+        csvContent += `"${row.material}";"${row.qtd}";"${row.unidade}";"${row.precoUnit.toFixed(2).replace('.', ',')}";"${row.subtotal.toFixed(2).replace('.', ',')}";"${row.fornecedor}"\n`;
+      });
+
+      csvContent += `\n"SUBTOTAL MATERIAIS";"";"";"";"R$ ${matTotal.toFixed(2).replace('.', ',')}";""\n`;
+      csvContent += `"MAO DE OBRA ESTIMADA";"";"";"";"R$ ${laborTotal.toFixed(2).replace('.', ',')}";""\n`;
+      csvContent += `"INVESTIMENTO TOTAL";"";"";"";"R$ ${(matTotal + laborTotal).toFixed(2).replace('.', ',')}";""\n`;
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Orcamento_OrceiObras_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function shareWhatsApp(source) {
+      let data = [];
+      let laborTotal = 0;
+      let headerTitle = 'ORÇAMENTO DE OBRA';
+
+      if (source === 'quick') { data = lastQuickState.items; laborTotal = lastQuickState.laborTotal; headerTitle = lastQuickState.title; }
+      else if (source === 'hardware') { data = lastHardwareState.items; laborTotal = lastHardwareState.laborTotal; headerTitle = lastHardwareState.title; }
+      else {
+        data = lastConsolidatedExport;
+        DB.get(DB_KEYS.CURRENT_STAGES).forEach(s => laborTotal += s.laborTotal);
+        headerTitle = document.getElementById('projectClientName')?.value.trim() || 'ORÇAMENTO CONSOLIDADO DA OBRA';
+      }
+
+      if (!data.length) return;
+
+      let matTotal = 0;
+      let msg = `*${headerTitle.toUpperCase()} - ORCEIOBRAS*\n`;
+      msg += `Data: ${new Date().toLocaleDateString('pt-BR')}\n\n`;
+
+      data.forEach(item => {
+        matTotal += item.subtotal;
+        msg += `• *${item.material}*: ${item.qtd} ${item.unidade} — R$ ${item.subtotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})} _(${item.fornecedor})_\n`;
+      });
+
+      msg += `\n*Materiais:* R$ ${matTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+      if (laborTotal > 0) {
+        msg += `\n*Mão de Obra:* R$ ${laborTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+      }
+      msg += `\n*TOTAL GERAL: R$ ${(matTotal + laborTotal).toLocaleString('pt-BR', {minimumFractionDigits: 2})}*`;
+
+      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    /* VITRINE DE LOJAS */
+    function renderStoresFeed() {
+      const query = document.getElementById('searchStore').value.toLowerCase();
+      const stores = DB.get(DB_KEYS.STORES);
+      const products = DB.get(DB_KEYS.PRODUCTS);
+
+      const filtered = stores.filter(s => {
+        const matchStore = s.name.toLowerCase().includes(query) || s.desc.toLowerCase().includes(query);
+        const storeProducts = products.filter(p => p.storeId === s.id);
+        const matchProduct = storeProducts.some(p => p.name.toLowerCase().includes(query) || p.category.toLowerCase().includes(query));
+        return matchStore || matchProduct;
+      });
+
+      document.getElementById('storesFeedGrid').innerHTML = filtered.map(s => `
+        <div class="store-card" onclick="openStoreView('${s.id}')">
+          <img class="banner" src="${s.banner}" alt="Banner">
+          <div class="store-card-body">
+            <div style="display:flex; align-items:center; gap:12px; margin-top:-32px; margin-bottom:10px;">
+              <img src="${s.avatar}" style="width:52px; height:52px; border-radius:50%; border:3px solid white; object-fit:cover; background:white;">
+              <div>
+                <h4 style="font-size:1rem; color:var(--navy-900); font-weight:700;">${s.name}</h4>
+                <span style="font-size:0.8rem; color:var(--terracotta-600); font-weight:600;">${s.phone}</span>
+              </div>
+            </div>
+            <p style="font-size:0.84rem; color:var(--slate-500); line-height:1.45;">${s.desc}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function handleCreateStore(e) {
+      e.preventDefault();
+      const stores = DB.get(DB_KEYS.STORES);
+      
+      const newStore = {
+        id: 'loja_' + Date.now(),
+        ownerEmail: currentUser.email,
+        name: document.getElementById('newStoreName').value,
+        doc: document.getElementById('newStoreDoc').value,
+        phone: document.getElementById('newStorePhone').value,
+        desc: document.getElementById('newStoreDesc').value,
+        avatar: document.getElementById('newStoreAvatar').value,
+        banner: document.getElementById('newStoreBanner').value
+      };
+
+      stores.push(newStore);
+      DB.set(DB_KEYS.STORES, stores);
+      
+      document.getElementById('createStoreForm').reset();
+      alert('Fornecedor cadastrado com sucesso!');
+      openStoreView(newStore.id);
+    }
+
+    function renderMyStores() {
+      const stores = DB.get(DB_KEYS.STORES).filter(s => s.ownerEmail === currentUser.email);
+      const container = document.getElementById('myStoresList');
+
+      if (stores.length === 0) {
+        container.innerHTML = '<p style="color:var(--slate-500);">Nenhuma loja vinculada ao seu perfil.</p>';
+        return;
+      }
+
+      container.innerHTML = stores.map(s => `
+        <div class="store-card" onclick="openStoreView('${s.id}')">
+          <img class="banner" src="${s.banner}" alt="Banner">
+          <div class="store-card-body">
+            <h4 style="font-size:1.05rem; color:var(--navy-900);">${s.name}</h4>
+            <p style="font-size:0.82rem; color:var(--slate-500); margin-top:4px;">${s.desc}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openStoreView(storeId) {
+      currentActiveStoreId = storeId;
+      const store = DB.get(DB_KEYS.STORES).find(s => s.id === storeId);
+      if (!store) return;
+
+      document.getElementById('viewStoreBanner').style.backgroundImage = `url('${store.banner}')`;
+      document.getElementById('viewStoreAvatar').src = store.avatar;
+      document.getElementById('viewStoreName').innerText = store.name;
+      document.getElementById('viewStoreDoc').innerText = `CNPJ/CPF: ${store.doc || 'Cadastrado'}`;
+      document.getElementById('viewStoreDesc').innerText = store.desc;
+      document.getElementById('viewStoreContact').innerText = `WhatsApp: ${store.phone}`;
+
+      const isOwner = store.ownerEmail === currentUser.email;
+      document.getElementById('btnAddProduct').style.display = isOwner ? 'inline-flex' : 'none';
+
+      renderStoreProducts(storeId);
+      navToPage('page-loja-view');
+    }
+
+    function renderStoreProducts(storeId) {
+      const products = DB.get(DB_KEYS.PRODUCTS).filter(p => p.storeId === storeId);
+      document.getElementById('viewStoreProductsGrid').innerHTML = products.map(p => `
+        <div class="clean-card" style="padding: 1.15rem;">
+          <span class="badge-tag badge-extra">${p.category}</span>
+          <h4 style="margin-top: 0.65rem; font-size: 1rem; color: var(--navy-900);">${p.name}</h4>
+          <p style="color: var(--terracotta-600); font-size: 1.15rem; font-weight: 700; margin-top: 4px;">R$ ${(p.price || 0).toLocaleString('pt-BR', {minimumFractionDigits:2})}</p>
+          <p style="color: var(--slate-500); font-size: 0.8rem; margin-top: 2px;">Unidade: <strong>${p.unit}</strong></p>
+        </div>
+      `).join('');
+    }
+
+    function openAddProductModal() {
+      const name = prompt("Nome do Material (ex: Vergalhão Aço CA-50 (10mm), Cimento CP-II (50kg)):");
+      if (!name) return;
+      const price = parseFloat(prompt("Preço Unitário (R$):", "35.00")) || 0;
+      const category = prompt("Categoria (Estrutural, Ferragens, Aglomerantes, Agregados, Madeiras):", "Estrutural");
+      const unit = prompt("Unidade (Un, Sacos, m³, Kg, m²):", "Sacos");
+
+      const products = DB.get(DB_KEYS.PRODUCTS);
+      products.push({ id: Date.now().toString(), storeId: currentActiveStoreId, name, price, category, unit });
+      DB.set(DB_KEYS.PRODUCTS, products);
+      renderStoreProducts(currentActiveStoreId);
+    }
+
+    initDatabase();
+    updateOnlineStatus();
+  </script>
+</body>
+</html>
